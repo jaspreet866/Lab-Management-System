@@ -1,0 +1,235 @@
+nav{
+    border-bottom: 2px solid rgb(245, 239, 239) ;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: #172033;
+  background:
+    radial-gradient(circle at top left, rgba(31, 122, 140, 0.16), transparent 32rem),
+    linear-gradient(135deg, #f7fbfc 0%, #eef4f6 46%, #f8faf9 100%);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.navbar {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+}
+
+.navbar-brand {
+  color: #165b68;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.nav-link {
+  color: #526070;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #165b68;
+}
+
+.auth-page {
+  min-height: calc(100vh - 82px);
+  display: flex;
+  align-items: center;
+  padding: 3rem 0;
+}
+
+.auth-shell {
+  width: min(100%, 1080px);
+}
+
+.auth-card {
+  overflow: hidden;
+  border: 1px solid rgba(22, 91, 104, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 24px 70px rgba(23, 32, 51, 0.14);
+}
+
+.form-panel,
+.side-panel {
+  min-height: 100%;
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+.form-panel {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.section-kicker {
+  margin-bottom: 0.75rem;
+  color: #1f7a8c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.form-panel h1,
+.side-panel h2 {
+  margin: 0;
+  color: #172033;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.form-panel h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.side-panel h2 {
+  max-width: 13ch;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  line-height: 1.05;
+}
+
+.auth-subtitle,
+.side-panel p {
+  margin: 1rem 0 2rem;
+  color: #627080;
+  line-height: 1.7;
+}
+
+.form-label {
+  color: #354357;
+  font-weight: 700;
+}
+
+.form-control {
+  min-height: 3.15rem;
+  border: 1px solid #d9e3e7;
+  border-radius: 8px;
+  color: #172033;
+  background-color: #fbfdfe;
+}
+
+.form-control:focus {
+  border-color: #1f7a8c;
+  box-shadow: 0 0 0 0.22rem rgba(31, 122, 140, 0.14);
+}
+
+.auth-btn {
+  min-height: 3.15rem;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1f7a8c, #165b68);
+  box-shadow: 0 14px 28px rgba(31, 122, 140, 0.22);
+}
+
+.auth-btn:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #23879b, #1a6978);
+}
+
+.side-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+  background:
+    linear-gradient(rgba(16, 54, 67, 0.88), rgba(16, 54, 67, 0.82)),
+    url("https://images.unsplash.com/photo-1581093458791-9f3c3900df7b?auto=format&fit=crop&w=1200&q=80") center/cover;
+}
+
+.side-panel .section-kicker,
+.side-panel h2,
+.side-panel p {
+  color: #fff;
+}
+
+.side-panel p {
+  opacity: 0.86;
+}
+
+.auth-list {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.auth-list li {
+  position: relative;
+  padding-left: 1.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+}
+
+.auth-list li::before {
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: #9ee5d5;
+  content: "";
+}
+
+.auth-highlight {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+}
+
+.auth-outline-btn {
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 800;
+}
+
+.auth-outline-btn:hover {
+  color: #165b68;
+  background: #fff;
+}
+
+@media (max-width: 991.98px) {
+  .auth-page {
+    align-items: flex-start;
+    padding: 1.5rem 0;
+  }
+
+  .side-panel {
+    min-height: 24rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .auth-card {
+    border-radius: 0;
+  }
+
+  .auth-shell {
+    padding: 0;
+  }
+
+  .form-panel,
+  .side-panel {
+    padding: 1.5rem;
+  }
+
+  .auth-highlight {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
