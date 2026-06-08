@@ -1,8 +1,31 @@
+import { useState } from "react"
 import { Link } from "react-router-dom"
 
 export const Login=()=>{
 
+    const[email,setemail]=useState("")
+    const[pass,setpass]=useState("")
 
+    const login=async(e)=>{
+        e.preventDefault()
+        const result=await fetch("http://localhost:9000/api/login",{
+            method:"post",
+            body:JSON.stringify({email,pass}),
+            headers:{"Content-type":"application/json;charset=UTF-8"}
+        })
+        if(result){
+            const res=await result.json()
+            if(res.statuscode===1){
+                alert("login successfully")
+            }
+            else if(res.statuscode==2){
+                alert("admin is here")
+            }
+            else{
+                alert("not")
+            }
+        }
+    }
 
     return(
         <>
@@ -17,14 +40,14 @@ export const Login=()=>{
 
                             <div className="mb-3">
                                 <label className="form-label">Email</label>
-                                <input className="form-control" type="email" placeholder="Enter email" />
+                                <input className="form-control" type="email" placeholder="Enter email" onChange={(e)=>setemail(e.target.value)} />
                             </div>
                             <div className="mb-4">
                                 <label className="form-label">Password</label>
-                                <input className="form-control" type="password" placeholder="Enter password" />
+                                <input className="form-control" type="password" placeholder="Enter password" onChange={(e)=>setpass(e.target.value)} />
                             </div>
 
-                            <button className="btn auth-btn w-100" type="submit">Login</button>
+                            <button className="btn auth-btn w-100" onClick={login}>Login</button>
                         </form>
                     </div>
 
