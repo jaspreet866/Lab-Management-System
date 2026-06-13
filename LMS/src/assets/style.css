@@ -296,6 +296,173 @@ body {
   background: linear-gradient(135deg, #1f7a8c, #165b68);
 }
 
+.dashboard-page {
+  min-height: calc(100vh - 82px);
+  padding: 2rem 0 3rem;
+}
+
+.dashboard-shell {
+  width: min(100%, 1440px);
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 2.5vw, 2rem);
+}
+
+.dashboard-header,
+.dashboard-panel,
+.dashboard-metric {
+  border: 1px solid rgba(22, 91, 104, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.dashboard-header h1,
+.dashboard-panel h2 {
+  margin: 0;
+  color: #172033;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.dashboard-header h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.dashboard-panel h2 {
+  font-size: 1.35rem;
+}
+
+.dashboard-subtitle {
+  max-width: 46rem;
+  margin: 0.85rem 0 0;
+  color: #627080;
+  line-height: 1.7;
+}
+
+.dashboard-status {
+  flex: 0 0 auto;
+}
+
+.dashboard-status .badge {
+  border: 1px solid rgba(31, 122, 140, 0.14);
+  color: #165b68;
+  font-weight: 800;
+}
+
+.dashboard-metric {
+  min-height: 8.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.35rem;
+}
+
+.dashboard-metric span {
+  color: #627080;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.dashboard-metric strong {
+  color: #165b68;
+  font-size: clamp(2rem, 4vw, 2.65rem);
+  line-height: 1;
+}
+
+.dashboard-panel {
+  min-height: 100%;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.dashboard-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(22, 91, 104, 0.1);
+}
+
+.equipment-card {
+  min-height: 7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem;
+  border: 1px solid #d9e3e7;
+  border-radius: 8px;
+  background: #fbfdfe;
+}
+
+.equipment-name,
+.lab-name {
+  margin: 0;
+  color: #172033;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.equipment-label,
+.lab-list-item span,
+.lab-capacity span {
+  color: #627080;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.equipment-card .badge {
+  min-width: 2.75rem;
+  padding: 0.65rem 0.85rem;
+  background: linear-gradient(135deg, #1f7a8c, #165b68) !important;
+}
+
+.lab-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.lab-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #d9e3e7;
+  border-radius: 8px;
+  background: #fbfdfe;
+}
+
+.lab-capacity {
+  min-width: 5rem;
+  text-align: right;
+}
+
+.lab-capacity strong {
+  display: block;
+  color: #165b68;
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+.dashboard-empty {
+  padding: 2rem;
+  border: 1px dashed #c7d5da;
+  border-radius: 8px;
+  color: #627080;
+  background: #fbfdfe;
+  font-weight: 700;
+  text-align: center;
+}
+
 @media (max-width: 991.98px) {
   .auth-page {
     align-items: flex-start;
@@ -304,6 +471,18 @@ body {
 
   .side-panel {
     min-height: 24rem;
+  }
+
+  .dashboard-page {
+    padding-top: 1rem;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+  }
+
+  .dashboard-status {
+    width: 100%;
   }
 }
 
@@ -333,5 +512,20 @@ body {
   .lms-sidebar {
     width: 100%;
     padding: 1rem;
+  }
+
+  .dashboard-shell {
+    padding: 0 1rem;
+  }
+
+  .dashboard-panel-header,
+  .lab-list-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lab-capacity {
+    min-width: 0;
+    text-align: left;
   }
 }

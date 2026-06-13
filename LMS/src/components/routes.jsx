@@ -14,7 +14,7 @@ export const Routee=()=>{
     return(
         <>
       <Routes>
-        <Route path="/login" element={<Login></Login>}></Route>
+        <Route path="/" element={<Login></Login>}></Route>
         <Route path="/register" element={<Register></Register>}/>
         <Route path="/side" element={<Sidebar></Sidebar>}/>
         <Route path="/lab" element={<Lab></Lab>}/>
