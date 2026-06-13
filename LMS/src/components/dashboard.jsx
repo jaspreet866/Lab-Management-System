@@ -4,27 +4,9 @@ import { Sidebar } from "./sidebar";
 export const Dashboard = () => {
   const [equip, setallequip] = useState([]);
   const [labs, setalllabs] = useState([]);
+  const [returndata, setallreturndata] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [returndata,setallreturndata]=useState([])
-
-  useEffect(() => {
-    const loadDashboard = async () => {
-      setLoading(true);
-      setError("");
-
-      try {
-        await Promise.all([show(), show2(),show3()]);
-      } catch (err) {
-        setError("Unable to load dashboard data. Please check the server and try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDashboard();
-  }, []);
-
   const show = async () => {
     const result = await fetch("http://localhost:9000/api/allequipments", {
       method: "get",
@@ -53,20 +35,37 @@ export const Dashboard = () => {
     }
   };
 
-const show3=async()=>{
-  const result=await fetch("http://localhost:9000/api/returndata",{
-    method:"get"
-  })
-if(result){
-const res=await result.json()
-if(res.statuscode===1){
-  setallreturndata(res.data)
-}
-else{
-  alert("fgfg")
-}
-}
-}
+  const show3 = async () => {
+    const result = await fetch("http://localhost:9000/api/returndata", {
+      method: "get",
+    });
+    if (result) {
+      const res = await result.json();
+      if (res.statuscode === 1) {
+        setallreturndata(res.data);
+      } else {
+        // keep previous behaviour minimal
+        alert("fgfg");
+      }
+    }
+  };
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        await Promise.all([show(), show2(), show3()]);
+      } catch (err) {
+        setError(err?.message || "Unable to load dashboard data. Please check the server and try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, []);
+
 
   const totalEquipment = equip.reduce((total, item) => total + Number(item.Quantity || 0), 0);
   const totalCapacity = labs.reduce((total, item) => total + Number(item.Capacity || 0), 0);
@@ -91,10 +90,11 @@ else{
 
               <div className="dashboard-status">
                 <span className="badge text-bg-light">Live Records</span>
+                {error && <div className="alert alert-danger mt-4 mb-0">{error}</div>}
               </div>
             </div>
 
-            {error && <div className="alert alert-danger mt-4 mb-0">{error}</div>}
+            
 
             <div className="row g-3 mt-1">
               <div className="col-12 col-md-4">
@@ -130,11 +130,7 @@ else{
                     </span>
                   </div>
 
-                  {loading ? (
-                    <div className="dashboard-empty">Loading equipment records...</div>
-                  ) : equip.length === 0 ? (
-                    <div className="dashboard-empty">No equipment records found.</div>
-                  ) : (
+                 
                     <div className="row g-3">
                       {equip.map((item, index) => (
                         <div className="col-12 col-sm-6" key={item._id || item.EquipmentName || index}>
@@ -150,7 +146,6 @@ else{
                         </div>
                       ))}
                     </div>
-                  )}
                 </div>
               </div>
 
@@ -189,59 +184,43 @@ else{
                 </div>
               </div>
             </div>
-             <section className="container-fluid">
-<div className="row g-3 mt-1">
-<div className="col col-12 ">
-   <div className="dashboard-panel shadow-sm">
-                  <div className="dashboard-panel-header">
-                    <div>
-                      <p className="section-kicker mb-1">Labs</p>
-                      <h2>Lab Details</h2>
-                    </div>
-                    <span className="badge bg-success-subtle text-success-emphasis">
-                      {labs.length} labs
-                    </span>
-                  </div>
-
-                  {/* {returndata ? (
-                    <div className="dashboard-empty">Loading Return records...</div>
-                  ) : returndata.length === 0 ? (
-                    <div className="dashboard-empty">No Return records found.</div>
-                  ) : (
-                    <div className="lab-list">
-                      {returndata.map((a) => 
-                        <div className="lab-list-item" key={a._id}>
-                          <div className="lab-capacity">
-                            <strong>{a.Name}</strong>
-                            <span>Capacity</span>
-                            <strong>{a.LabName}</strong>
-                            <span>Capacity</span>
-                            <strong>{a.Issue}</strong>
-                            <span>Capacity</span>
-                            <strong>{a.Date}</strong>
-                            <span>Capacity</span>
-                            <strong>{a.Status}</strong>
-                            <span>Capacity</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )} */}
-                  {
-                    returndata.map((a)=>
+            <section className="container-fluid">
+              <div className="row g-4 mt-1">
+                <div className="col-12">
+                  <div className="dashboard-panel returns-panel shadow-sm">
+                    <div className="dashboard-panel-header">
                       <div>
-                        <p>{a.Name}</p>
-                        <p>{a.LabName}</p>
-                        <p>{a.Issue}</p>
-                        <p>{a.Date}</p>
-                        <p>{a.Status}</p>
+                        <p className="section-kicker mb-1">Returns</p>
+                        <h2>Returned Items</h2>
                       </div>
-                    )
-                  }
+                      <span className="badge returns-count">
+                        {returndata.length} records
+                      </span>
+                    </div>
+
+                   
+                      <div className="returns-list">
+                        {returndata.map((a) => (
+                          <div className="return-item" key={a._id || a.Name}>
+                            <div className="return-main">
+                              <div className="return-name">{a.Name}</div>
+                              <div className="return-lab">{a.LabName}</div>
+                              <div className="return-issue">{a.Issue}</div>
+                            </div>
+                            <div className="return-meta">
+                              <div className="return-date">{a.Date}</div>
+                              <div className={`return-status ${a.Status ? a.Status.toLowerCase() : ''}`}>
+                                {a.Status}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    
+                  </div>
                 </div>
-</div>
-</div>
-          </section>
+              </div>
+            </section>
             
           </section>
          

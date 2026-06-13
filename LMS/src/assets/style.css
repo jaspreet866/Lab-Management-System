@@ -463,6 +463,90 @@ body {
   text-align: center;
 }
 
+/* Returns panel styles */
+.returns-panel {
+  padding: 1rem 1rem;
+}
+
+.returns-count {
+  background: rgba(22, 91, 104, 0.06);
+  color: #165b68;
+  font-weight: 800;
+  border: 1px solid rgba(31, 122, 140, 0.08);
+}
+
+.returns-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.return-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d9e3e7;
+  border-radius: 8px;
+  background: #fbfdfe;
+}
+
+.return-main {
+  display: flex;
+  gap: 1.25rem;
+  align-items: baseline;
+}
+
+.return-name {
+  font-weight: 800;
+  color: #172033;
+}
+
+.return-lab,
+.return-issue {
+  color: #627080;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.return-meta {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.return-date {
+  color: #526070;
+  font-weight: 700;
+}
+
+.return-status {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-transform: capitalize;
+}
+
+.return-status.pending {
+  background: #fff4e6;
+  color: #a65a00;
+  border: 1px solid rgba(166, 90, 0, 0.08);
+}
+
+.return-status.returned {
+  background: #ecfdf3;
+  color: #027a48;
+  border: 1px solid rgba(2, 122, 72, 0.08);
+}
+
+.return-status.overdue {
+  background: #fff1f2;
+  color: #9a123a;
+  border: 1px solid rgba(154, 18, 58, 0.08);
+}
+
 @media (max-width: 991.98px) {
   .auth-page {
     align-items: flex-start;

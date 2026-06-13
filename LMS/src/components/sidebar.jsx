@@ -33,14 +33,13 @@ export const Sidebar=()=>{
                         <Link className="nav-link sidebar-link" to="/lab">Add Lab</Link>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link sidebar-link" href="#issue">Issue</a>
+                        <Link className="nav-link sidebar-link" to="/allocate">Return</Link>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link sidebar-link" href="#return">Return</a>
+                        <Link className="nav-link sidebar-link" to="/return">Allocate</Link>
                     </li>
-                    <li className="nav-item">
-                        <a className="nav-link sidebar-link" href="#maintenance">Maintenance</a>
-                    </li>
+                   
+                   
                 </ul>
             </div>
         </aside>
