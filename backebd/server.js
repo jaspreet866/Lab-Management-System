@@ -97,6 +97,16 @@ app.get("/api/getlab", async (req, res) => {
     }
 })
 
+app.get("/api/getlab2/:id",async(req,res)=>{
+    const result = await lab.find({_id:req.params.id})
+    if(result){
+        res.send({statuscode:1,data:result})
+    }
+    else{
+        res.send({statuscode:0})
+    }
+})
+
 
 
 // Equipment Add Remove

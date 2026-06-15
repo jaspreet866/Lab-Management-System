@@ -547,6 +547,72 @@ body {
   border: 1px solid rgba(154, 18, 58, 0.08);
 }
 
+/* LabDash card styles */
+.lab-card {
+  border: 1px solid rgba(22, 91, 104, 0.08);
+  box-shadow: 0 8px 18px rgba(23, 32, 51, 0.06);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.lab-title {
+  color: #165b68;
+  font-weight: 800;
+}
+
+.lab-meta {
+  color: #627080;
+  font-weight: 700;
+}
+
+.btn-return {
+  border: 0;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1f7a8c, #165b68);
+  color: #fff;
+  font-weight: 800;
+}
+
+.btn-return:hover {
+  background: linear-gradient(135deg, #23879b, #1a6978);
+}
+
+/* LabDash hero and stats */
+.lab-hero {
+  background: linear-gradient(135deg, rgba(31,122,140,0.06), rgba(22,91,104,0.03));
+  border: 1px solid rgba(22,91,104,0.06);
+}
+
+.stats-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid rgba(22,91,104,0.06);
+  border-radius: 8px;
+  min-width: 8rem;
+}
+
+.stat-label {
+  color: #627080;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.stat-value {
+  color: #165b68;
+  font-weight: 900;
+  font-size: 1.35rem;
+}
+
+.lab-card:hover {
+  transform: translateY(-4px);
+  transition: transform 200ms ease;
+}
+
 @media (max-width: 991.98px) {
   .auth-page {
     align-items: flex-start;

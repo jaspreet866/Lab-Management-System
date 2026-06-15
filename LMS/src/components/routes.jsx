@@ -7,6 +7,7 @@ import { AddEquipment } from "./equipment"
 import { Allocate } from "./issue"
 import { Dashboard } from "./dashboard"
 import { Return } from "./return"
+import { LabDash } from "./labdash"
 export const Routee=()=>{
 
 
@@ -22,6 +23,7 @@ export const Routee=()=>{
         <Route path="/allocate" element={<Allocate></Allocate>}/>
         <Route path="/dashboard" element={<Dashboard></Dashboard>}/>
         <Route path="/return" element={<Return></Return>}/>
+        <Route path="/labdash" element={<LabDash></LabDash>}/>
     </Routes>  
         </>
     )
