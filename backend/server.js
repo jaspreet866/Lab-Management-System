@@ -43,7 +43,7 @@ app.post("/api/register", async (req, res) => {
 
 app.post("/api/login", async (req, res) => {
     if (req.body.email == "Admin@gmail.com" && req.body.pass == "Admin@123") {
-        res.send({ statuscode: 2 })
+        res.send({ statuscode: 2 ,utype:"Admin"})
     }
     else {
         const result = await user.findOne({ Email: req.body.email })

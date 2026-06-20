@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Sidebar } from "./sidebar"
 
 export const Lab=()=>{
 
@@ -32,7 +33,10 @@ export const Lab=()=>{
         <section className="management-page">
             <div className="container">
                 <div className="row justify-content-center">
-                    <div className="col-12 col-md-10 col-lg-7">
+                   <div className="col">
+                    <Sidebar></Sidebar>
+                   </div>
+                    <div className="col-6 col-md-10 col-lg-9">
                         <div className="management-card shadow-sm">
                             <p className="section-kicker">Lab Setup</p>
                             <h1>Add Lab</h1>

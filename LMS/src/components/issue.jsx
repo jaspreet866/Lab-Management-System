@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Sidebar } from "./sidebar";
+import { useNavigate } from "react-router-dom";
 
 export const Allocate = () => {
   const [labs, setlabs] = useState([]);
@@ -7,6 +9,8 @@ export const Allocate = () => {
   const [quantity, setquantity] = useState("");
   const [allequip, setallequip] = useState([]);
   const [equipment, setequipment] = useState("");
+  const {usertype}=useContext()
+  const navigate=useNavigate()
 
   useEffect(() => {
     show();
@@ -104,10 +108,14 @@ export const Allocate = () => {
 
   return (
     <>
-      <section className="management-page">
+      {
+        usertype === "Admin" ? <section className="management-page">
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-12 col-md-10 col-lg-7">
+            <div className="col">
+              <Sidebar></Sidebar>
+            </div>
+            <div className="col-6 col-md-10 col-lg-9">
               <div className="management-card shadow-sm">
                 <p className="section-kicker">Equipment Issue</p>
 
@@ -186,7 +194,8 @@ export const Allocate = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section>:navigate("/")
+      }
     </>
   );
 };

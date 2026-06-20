@@ -1,9 +1,13 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { Sidebar } from "./sidebar"
+import { useNavigate } from "react-router-dom"
 
 export const AddEquipment=()=>{
 
 const [name,setname]=useState("")
 const [quantity,setquantity]=useState("")
+const {usertype}=useContext()
+const navigate=useNavigate()
 
 
 const add=async(e)=>{
@@ -26,10 +30,14 @@ const add=async(e)=>{
 
     return(
         <>
-        <section className="management-page">
+      {
+        usertype === "Admin"?  <section className="management-page">
             <div className="container">
                 <div className="row justify-content-center">
-                    <div className="col-12 col-md-10 col-lg-7">
+                   <div className="col">
+                    <Sidebar></Sidebar>
+                   </div>
+                    <div className="col-12 col-md-10 col-lg-9">
                         <div className="management-card shadow-sm">
                             <p className="section-kicker">Inventory</p>
                             <h1>Add Equipment</h1>
@@ -63,7 +71,8 @@ const add=async(e)=>{
                     </div>
                 </div>
             </div>
-        </section>
+        </section>:navigate("/")
+      }
         </>
     )
 }

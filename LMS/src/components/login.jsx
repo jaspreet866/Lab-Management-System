@@ -1,10 +1,16 @@
-import { useState } from "react"
+import { useContext,  useState } from "react"
 import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { Context } from "./context"
 
 export const Login=()=>{
 
     const[email,setemail]=useState("")
     const[pass,setpass]=useState("")
+    const navigate=useNavigate("")
+    const {usertype,setusertype}=useContext(Context)
+
+   
 
     const login=async(e)=>{
         e.preventDefault()
@@ -19,7 +25,11 @@ export const Login=()=>{
                 alert("login successfully")
             }
             else if(res.statuscode==2){
-                alert("admin is here")
+                
+                alert("admin is here"+res.utype)
+                navigate("/dashboard")
+setusertype("Admin")
+localStorage.setItem("Utype",res.utype)
             }
             else{
                 alert("not")

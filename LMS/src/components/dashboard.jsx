@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Sidebar } from "./sidebar";
+import { Context } from "./context";
+import { useNavigate } from "react-router-dom";
 
 export const Dashboard = () => {
   const [equip, setallequip] = useState([]);
@@ -7,6 +9,16 @@ export const Dashboard = () => {
   const [returndata, setallreturndata] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate=useNavigate()
+
+
+const{usertype}=useContext(Context)
+
+
+
+
+
+
   const show = async () => {
     const result = await fetch("http://localhost:9000/api/allequipments", {
       method: "get",
@@ -71,7 +83,8 @@ export const Dashboard = () => {
   const totalCapacity = labs.reduce((total, item) => total + Number(item.Capacity || 0), 0);
 
   return (
-    <main className="dashboard-page">
+    <>
+    {usertype === "Admin" ? <main className="dashboard-page">
       <div className="container-fluid dashboard-shell">
         <div className="row g-4 align-items-start">
           <div className="col-12 col-lg-auto">
@@ -226,6 +239,7 @@ export const Dashboard = () => {
          
         </div>
       </div>
-    </main>
+    </main>:navigate("/")}
+    </>
   );
 };
