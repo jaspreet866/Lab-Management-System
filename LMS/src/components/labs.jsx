@@ -3,14 +3,16 @@ import { Sidebar } from "./sidebar"
 
 export const Lab=()=>{
 
-
     const [incharge,setincharge]=useState("")
     const [labname,setlabname]=useState("")
     const[capacity,setcapacity]=useState("")
 
-
     const add=async(e)=>{
         e.preventDefault()
+        if (!incharge || !labname || !capacity) {
+            alert("Please fill in all fields")
+            return
+        }
         const result=await fetch("http://localhost:9000/api/addlab",{
             method:"post",
             body:JSON.stringify({incharge,labname,capacity}),
@@ -19,24 +21,23 @@ export const Lab=()=>{
         if(result){
             const res=await result.json()
             if(res.statuscode===1){
-                alert("added")
+                alert("Lab added successfully")
             }
             else{
-                alert("not")
+                alert("Failed to add lab")
             }
         }
     }
 
-
     return(
         <>
         <section className="management-page">
-            <div className="container">
-                <div className="row justify-content-center">
-                   <div className="col">
-                    <Sidebar></Sidebar>
-                   </div>
-                    <div className="col-6 col-md-10 col-lg-9">
+            <div className="container-fluid dashboard-shell">
+                <div className="row g-4 align-items-start">
+                    <div className="col-12 col-lg-auto">
+                        <Sidebar></Sidebar>
+                    </div>
+                    <div className="col">
                         <div className="management-card shadow-sm">
                             <p className="section-kicker">Lab Setup</p>
                             <h1>Add Lab</h1>
@@ -45,36 +46,60 @@ export const Lab=()=>{
                             <form onSubmit={add}>
                                 <div className="mb-3">
                                     <label className="form-label">Lab Incharge</label>
-                                    <input
-                                        className="form-control"
-                                        type="text"
-                                        placeholder="Lab Incharge"
-                                        onChange={(e)=>setincharge(e.target.value)}
-                                    />
+                                    <div className="input-group">
+                                        <span className="input-group-text bg-light border-end-0">
+                                            <i className="bi bi-person-badge text-muted"></i>
+                                        </span>
+                                        <input
+                                            className="form-control border-start-0 ps-0"
+                                            type="text"
+                                            placeholder="e.g. Dr. John Doe"
+                                            value={incharge}
+                                            onChange={(e)=>setincharge(e.target.value)}
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="mb-3">
                                     <label className="form-label">Lab Name</label>
-                                    <input
-                                        className="form-control"
-                                        type="text"
-                                        placeholder="Lab Name"
-                                        onChange={(e)=>setlabname(e.target.value)}
-                                    />
+                                    <div className="input-group">
+                                        <span className="input-group-text bg-light border-end-0">
+                                            <i className="bi bi-building text-muted"></i>
+                                        </span>
+                                        <input
+                                            className="form-control border-start-0 ps-0"
+                                            type="text"
+                                            placeholder="e.g. Physics Lab 1"
+                                            value={labname}
+                                            onChange={(e)=>setlabname(e.target.value)}
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="mb-4">
                                     <label className="form-label">Maximum Capacity</label>
-                                    <input
-                                        className="form-control"
-                                        type="number"
-                                        min="1"
-                                        placeholder="Maximum Capacity"
-                                        onChange={(e)=>setcapacity(e.target.value)}
-                                    />
+                                    <div className="input-group">
+                                        <span className="input-group-text bg-light border-end-0">
+                                            <i className="bi bi-people text-muted"></i>
+                                        </span>
+                                        <input
+                                            className="form-control border-start-0 ps-0"
+                                            type="number"
+                                            min="1"
+                                            placeholder="e.g. 30"
+                                            value={capacity}
+                                            onChange={(e)=>setcapacity(e.target.value)}
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
-                                <button className="btn auth-btn w-100" type="submit">Add Lab</button>
+                                <button className="btn auth-btn w-100 d-flex align-items-center justify-content-center gap-2" type="submit">
+                                    <span>Add Lab</span>
+                                    <i className="bi bi-plus-circle"></i>
+                                </button>
                             </form>
                         </div>
                     </div>

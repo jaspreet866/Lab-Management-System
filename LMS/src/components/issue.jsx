@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Sidebar } from "./sidebar";
 import { useNavigate } from "react-router-dom";
+import { Context } from "./context";
 
 export const Allocate = () => {
   const [labs, setlabs] = useState([]);
@@ -9,8 +10,14 @@ export const Allocate = () => {
   const [quantity, setquantity] = useState("");
   const [allequip, setallequip] = useState([]);
   const [equipment, setequipment] = useState("");
-  const {usertype}=useContext()
+  const {usertype}=useContext(Context)
   const navigate=useNavigate()
+
+  useEffect(() => {
+    if (usertype !== "Admin" && localStorage.getItem("Utype") !== "Admin") {
+      navigate("/");
+    }
+  }, [usertype, navigate]);
 
   useEffect(() => {
     show();
@@ -55,9 +62,7 @@ export const Allocate = () => {
 
     const res = await result.json();
 
-    if (res.statuscode === 1) {
-      alert("Quantity Updated");
-    } else {
+    if (res.statuscode !== 1) {
       alert("Update failed");
     }
   };
@@ -67,8 +72,23 @@ export const Allocate = () => {
 
     const selectedEquipment = allequip.find((item) => item._id === equipment);
 
+    if (!selectedLab) {
+      alert("Please select a lab");
+      return;
+    }
+
     if (!selectedEquipment) {
       alert("Select equipment");
+      return;
+    }
+
+    if (!issueDate) {
+      alert("Please select an issue date");
+      return;
+    }
+
+    if (!quantity || Number(quantity) <= 0) {
+      alert("Please enter a valid quantity");
       return;
     }
 
@@ -93,11 +113,15 @@ export const Allocate = () => {
     const res = await result.json();
 
     if (res.statuscode === 1) {
-      alert("Allocated");
+      alert("Allocated successfully!");
 
       const remainingQuantity = selectedEquipment.Quantity - Number(quantity);
 
       await upd(remainingQuantity);
+      setselectedLab("");
+      setequipment("");
+      setissueDate("");
+      setquantity("");
 
       // Refresh equipment list
       show2();
@@ -108,94 +132,111 @@ export const Allocate = () => {
 
   return (
     <>
-      {
-        usertype === "Admin" ? <section className="management-page">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col">
+      <section className="management-page">
+        <div className="container-fluid dashboard-shell">
+          <div className="row g-4 align-items-start">
+            <div className="col-12 col-lg-auto">
               <Sidebar></Sidebar>
             </div>
-            <div className="col-6 col-md-10 col-lg-9">
+            <div className="col">
               <div className="management-card shadow-sm">
                 <p className="section-kicker">Equipment Issue</p>
 
                 <h1>Allocate Equipment</h1>
 
                 <p className="management-subtitle">
-                  Select a lab, issue date, and quantity for allocation.
+                  Select a lab, equipment, issue date, and quantity for allocation.
                 </p>
 
                 <form onSubmit={allocate}>
                   <div className="mb-3">
                     <label className="form-label">Select Lab</label>
-
-                    <select
-                      className="form-select management-select"
-                      value={selectedLab}
-                      onChange={(e) => setselectedLab(e.target.value)}
-                    >
-                      <option value="">Select Lab</option>
-
-                      {labs.map((a) => (
-                        <option key={a._id} value={a._id}>
-                          {a.LabName}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0">
+                        <i className="bi bi-building text-muted"></i>
+                      </span>
+                      <select
+                        className="form-select management-select border-start-0 ps-0"
+                        value={selectedLab}
+                        onChange={(e) => setselectedLab(e.target.value)}
+                        required
+                      >
+                        <option value="">Select Lab</option>
+                        {labs.map((a) => (
+                          <option key={a._id} value={a._id}>
+                            {a.LabName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   <div className="mb-3">
                     <label className="form-label">Select Equipment</label>
-
-                    <select
-                      className="form-select management-select"
-                      value={equipment}
-                      onChange={(e) => setequipment(e.target.value)}
-                    >
-                      <option value="">Select Equipment</option>
-
-                      {allequip.map((a) => (
-                        <option key={a._id} value={a._id}>
-                          {a.EquipmentName}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0">
+                        <i className="bi bi-cpu text-muted"></i>
+                      </span>
+                      <select
+                        className="form-select management-select border-start-0 ps-0"
+                        value={equipment}
+                        onChange={(e) => setequipment(e.target.value)}
+                        required
+                      >
+                        <option value="">Select Equipment</option>
+                        {allequip.map((a) => (
+                          <option key={a._id} value={a._id}>
+                            {a.EquipmentName} ({a.Quantity} available)
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   <div className="mb-3">
                     <label className="form-label">Issue Date</label>
-
-                    <input
-                      className="form-control"
-                      type="date"
-                      value={issueDate}
-                      onChange={(e) => setissueDate(e.target.value)}
-                    />
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0">
+                        <i className="bi bi-calendar-event text-muted"></i>
+                      </span>
+                      <input
+                        className="form-control border-start-0 ps-0"
+                        type="date"
+                        value={issueDate}
+                        onChange={(e) => setissueDate(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="mb-4">
                     <label className="form-label">Quantity</label>
-
-                    <input
-                      className="form-control"
-                      type="number"
-                      min="1"
-                      value={quantity}
-                      placeholder="Quantity"
-                      onChange={(e) => setquantity(e.target.value)}
-                    />
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0">
+                        <i className="bi bi-hash text-muted"></i>
+                      </span>
+                      <input
+                        className="form-control border-start-0 ps-0"
+                        type="number"
+                        min="1"
+                        value={quantity}
+                        placeholder="Quantity to issue"
+                        onChange={(e) => setquantity(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
 
-                  <button className="btn auth-btn w-100" type="submit">
-                    Allocate
+                  <button className="btn auth-btn w-100 d-flex align-items-center justify-content-center gap-2" type="submit">
+                    <span>Allocate Stock</span>
+                    <i className="bi bi-box-arrow-up"></i>
                   </button>
                 </form>
               </div>
             </div>
           </div>
         </div>
-      </section>:navigate("/")
-      }
+      </section>
     </>
   );
 };

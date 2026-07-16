@@ -1,45 +1,64 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
 export const Sidebar=()=>{
-
-
+    const location = useLocation();
+    const currentPath = location.pathname;
 
     return(
         <>
-        <aside className="lms-sidebar">
-            <div className="sidebar-card shadow-sm">
+        <aside className="lms-sidebar shadow-sm">
+            <div className="sidebar-card">
                 <div className="sidebar-header">
                     <p className="section-kicker mb-1">Workspace</p>
-                    <h2 className="sidebar-title">Dashboard</h2>
-                </div>
-
-                <div className="mb-4">
-                    <label className="form-label">Select Lab</label>
-                    <select className="form-select sidebar-select" defaultValue="LAB 1">
-                        <option>LAB 1</option>
-                        <option>LAB 2</option>
-                        <option>LAB 3</option>
-                    </select>
+                    <h2 className="sidebar-title">Menu</h2>
                 </div>
 
                 <ul className="nav nav-pills flex-column gap-2">
                     <li className="nav-item">
-                        <Link className="nav-link sidebar-link active" to="/side">Dashboard</Link>
+                        <Link 
+                            className={`nav-link sidebar-link ${currentPath === "/dashboard" ? "active" : ""}`} 
+                            to="/dashboard"
+                        >
+                            <i className="bi bi-grid-1x2"></i>
+                            <span>Dashboard</span>
+                        </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link sidebar-link" to="/equipment">Add Equipment</Link>
+                        <Link 
+                            className={`nav-link sidebar-link ${currentPath === "/equipment" ? "active" : ""}`} 
+                            to="/equipment"
+                        >
+                            <i className="bi bi-plus-square"></i>
+                            <span>Add Equipment</span>
+                        </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link sidebar-link" to="/lab">Add Lab</Link>
+                        <Link 
+                            className={`nav-link sidebar-link ${currentPath === "/lab" ? "active" : ""}`} 
+                            to="/lab"
+                        >
+                            <i className="bi bi-house-gear"></i>
+                            <span>Add Lab</span>
+                        </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link sidebar-link" to="/allocate">Return</Link>
+                        <Link 
+                            className={`nav-link sidebar-link ${currentPath === "/allocate" ? "active" : ""}`} 
+                            to="/allocate"
+                        >
+                            <i className="bi bi-box-arrow-up"></i>
+                            <span>Allocate Stock</span>
+                        </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link sidebar-link" to="/return">Allocate</Link>
+                        <Link 
+                            className={`nav-link sidebar-link ${currentPath === "/return" ? "active" : ""}`} 
+                            to="/return"
+                        >
+                            <i className="bi bi-box-arrow-down"></i>
+                            <span>Return Device</span>
+                        </Link>
                     </li>
-                   
-                   
                 </ul>
             </div>
         </aside>

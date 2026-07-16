@@ -8,6 +8,10 @@ export const Register = () => {
 
   const register = async (e) => {
     e.preventDefault();
+    if (!name || !email || !pass) {
+      alert("Please fill in all fields");
+      return;
+    }
     const result = await fetch("http://localhost:9000/api/register", {
       method: "post",
       body: JSON.stringify({ name, email, pass }),
@@ -16,9 +20,9 @@ export const Register = () => {
     if (result.ok) {
       const res = await result.json();
       if (res.statuscode === 1) {
-        alert("registered");
+        alert("Registered successfully!");
       } else {
-        alert("not");
+        alert("Registration failed");
       }
     }
   };
@@ -37,42 +41,64 @@ export const Register = () => {
                 </p>
 
                 <div className="mb-3">
-                  <label className="form-label">Name</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Name"
-                    onChange={(e) => setname(e.target.value)}
-                  />
+                  <label className="form-label">Full Name</label>
+                  <div className="input-group">
+                    <span className="input-group-text bg-light border-end-0">
+                      <i className="bi bi-person text-muted"></i>
+                    </span>
+                    <input
+                      type="text"
+                      className="form-control border-start-0 ps-0"
+                      placeholder="Your Name"
+                      value={name}
+                      onChange={(e) => setname(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Email</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="Email"
-                    onChange={(e) => setemail(e.target.value)}
-                  />
+                  <label className="form-label">Email Address</label>
+                  <div className="input-group">
+                    <span className="input-group-text bg-light border-end-0">
+                      <i className="bi bi-envelope text-muted"></i>
+                    </span>
+                    <input
+                      type="email"
+                      className="form-control border-start-0 ps-0"
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setemail(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="mb-4">
                   <label className="form-label">Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Password"
-                    onChange={(e) => setpass(e.target.value)}
-                  />
+                  <div className="input-group">
+                    <span className="input-group-text bg-light border-end-0">
+                      <i className="bi bi-lock text-muted"></i>
+                    </span>
+                    <input
+                      type="password"
+                      className="form-control border-start-0 ps-0"
+                      placeholder="••••••••"
+                      value={pass}
+                      onChange={(e) => setpass(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
 
-                <button className="btn auth-btn w-100" type="submit">
-                  Register
+                <button className="btn auth-btn w-100 d-flex align-items-center justify-content-center gap-2" type="submit">
+                  <span>Register</span>
+                  <i className="bi bi-person-plus"></i>
                 </button>
               </form>
             </div>
 
             <div className="col-lg-6">
               <div className="side-panel">
-                <p className="section-kicker">Lab Management System</p>
+                <p className="section-kicker text-white opacity-75">Lab Management System</p>
                 <h2>Create your account</h2>
 
                 <p>
@@ -88,7 +114,7 @@ export const Register = () => {
 
                 <div className="auth-highlight">
                   <span>Already have an account?</span>
-                  <Link className="btn auth-outline-btn" to="/login">
+                  <Link className="btn auth-outline-btn" to="/">
                     Login
                   </Link>
                 </div>

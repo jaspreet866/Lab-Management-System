@@ -13,7 +13,7 @@ const[usertype,setusertype]=useState(" ")
  useEffect(() => {
     const ut = localStorage.getItem("Utype");
     if(ut=="Admin"){
- setusertype("Admin")
+      setusertype("Admin")
     }
     else{
       setusertype("User")
