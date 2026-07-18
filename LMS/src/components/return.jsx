@@ -1,10 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "./sidebar";
+import { gsap } from "gsap";
 
 export const Return = () => {
   const [name, setname] = useState("");
   const [labname, setlabname] = useState("");
   const [issue, setissue] = useState("");
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(".management-card",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+      );
+      gsap.fromTo(".management-card form > *",
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out", delay: 0.15 }
+      );
+    }, formRef);
+    return () => ctx.revert();
+  }, []);
 
   const add = async (e) => {
     e.preventDefault()
@@ -32,7 +48,7 @@ export const Return = () => {
   };
   return (
     <>
-      <section className="management-page">
+      <section className="management-page" ref={formRef}>
         <div className="container-fluid dashboard-shell">
           <div className="row g-4 align-items-start">
            <div className="col-12 col-lg-auto">

@@ -1,9 +1,30 @@
-import {  useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-
+import { Context } from "./context";
+import { gsap } from "gsap";
 
 export const Header = () => {
   const [data, setdata] = useState([]);
+  const {usertype,setusertype}=useContext(Context)
+  const headerRef = useRef(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Gentle spin & scale on the cpu logo icon
+      gsap.fromTo(".navbar-brand i",
+        { rotate: -180, scale: 0.5, opacity: 0 },
+        { rotate: 0, scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.7)" }
+      );
+
+      // Stagger nav links in from the right
+      gsap.fromTo(".navbar-nav > li",
+        { opacity: 0, x: 20 },
+        { opacity: 1, x: 0, duration: 0.5, stagger: 0.06, ease: "power2.out", delay: 0.1 }
+      );
+    }, headerRef);
+
+    return () => ctx.revert();
+  }, []);
   const show = async () => {
     const result = await fetch("http://localhost:9000/api/getlab", {
       method: "get",
@@ -29,12 +50,14 @@ export const Header = () => {
   const logout=()=>{
     localStorage.clear()
     alert("Successfully Logout")
+    setusertype("")
+
   }
  
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg sticky-top">
+      <nav className="navbar navbar-expand-lg sticky-top" ref={headerRef}>
         <div className="container-fluid header-shell px-md-4">
           <div className="d-flex align-items-center gap-3">
             <button

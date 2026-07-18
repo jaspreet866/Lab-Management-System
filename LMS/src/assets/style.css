@@ -264,6 +264,9 @@ a {
 .sidebar-link.active i {
   color: var(--text-white);
 }
+.sidebar-link.active span {
+  color: var(--text-white);
+}
 
 /* ----------------------------------------------------
    AUTH PAGES (LOGIN & REGISTER)
@@ -363,6 +366,7 @@ a {
 
 .auth-btn:hover {
   background: linear-gradient(135deg, var(--primary-hover), #4f46e5);
+  color: var(--text-white);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
 }
@@ -993,9 +997,9 @@ a {
 }
 
 .btn-return {
-  background: var(--primary);
-  border: none;
-  color: var(--text-white);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  background-color: white;
   font-family: var(--font-primary);
   font-weight: 600;
   font-size: 0.85rem;
@@ -1007,6 +1011,7 @@ a {
 
 .btn-return:hover {
   background: var(--primary-hover);
+  color: white;
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(79, 70, 229, 0.25);
 }

@@ -1,7 +1,8 @@
-import { useContext,  useState } from "react"
+import { useContext, useState, useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { Context } from "./context"
+import { gsap } from "gsap"
 
 export const Login=()=>{
 
@@ -9,6 +10,31 @@ export const Login=()=>{
     const[pass,setpass]=useState("")
     const navigate=useNavigate("")
     const {usertype,setusertype}=useContext(Context)
+    const containerRef = useRef(null)
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            // Animating the overall card container
+            gsap.fromTo(".auth-card", 
+                { opacity: 0, y: 40, scale: 0.98 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out" }
+            );
+
+            // Stagger form items (kicker, h1, subtitle, input groups, buttons)
+            gsap.fromTo(".form-panel > *",
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: "power2.out", delay: 0.2 }
+            );
+
+            // Stagger side panel contents from the right
+            gsap.fromTo(".side-panel > *",
+                { opacity: 0, x: 30 },
+                { opacity: 1, x: 0, duration: 0.6, stagger: 0.08, ease: "power2.out", delay: 0.3 }
+            );
+        }, containerRef);
+
+        return () => ctx.revert();
+    }, []);
 
     const login=async(e)=>{
         e.preventDefault()
@@ -43,7 +69,7 @@ export const Login=()=>{
 
     return(
         <>
-        <section className="auth-page">
+        <section className="auth-page" ref={containerRef}>
             <div className="auth-shell container">
                 <div className="auth-card row g-0 align-items-stretch">
                     <div className="col-lg-6">

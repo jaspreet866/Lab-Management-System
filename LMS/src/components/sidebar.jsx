@@ -1,12 +1,33 @@
+import { useEffect, useRef } from "react"
 import { Link, useLocation } from "react-router-dom"
+import { gsap } from "gsap"
 
 export const Sidebar=()=>{
     const location = useLocation();
     const currentPath = location.pathname;
+    const sidebarRef = useRef(null);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            // Slide sidebar card in from left with ease
+            gsap.fromTo(".sidebar-card", 
+                { opacity: 0, x: -30 },
+                { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" }
+            );
+
+            // Stagger nav-item menu links
+            gsap.fromTo(".nav-item",
+                { opacity: 0, x: -15 },
+                { opacity: 1, x: 0, duration: 0.4, stagger: 0.05, ease: "power2.out", delay: 0.15 }
+            );
+        }, sidebarRef);
+
+        return () => ctx.revert();
+    }, []);
 
     return(
         <>
-        <aside className="lms-sidebar shadow-sm">
+        <aside className="lms-sidebar shadow-sm" ref={sidebarRef}>
             <div className="sidebar-card">
                 <div className="sidebar-header">
                     <p className="section-kicker mb-1">Workspace</p>

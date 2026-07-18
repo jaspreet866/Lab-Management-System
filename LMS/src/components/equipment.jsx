@@ -1,14 +1,30 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState, useRef } from "react"
 import { Sidebar } from "./sidebar"
 import { useNavigate } from "react-router-dom"
 import { Context } from "./context"
+import { gsap } from "gsap"
 
 export const AddEquipment=()=>{
 
-const [name,setname]=useState("")
-const [quantity,setquantity]=useState("")
-const {usertype}=useContext(Context)
-const navigate=useNavigate()
+const [name,setname] = useState("")
+const [quantity,setquantity] = useState("")
+const {usertype} = useContext(Context)
+const navigate = useNavigate()
+const formRef = useRef(null)
+
+useEffect(() => {
+    const ctx = gsap.context(() => {
+        gsap.fromTo(".management-card",
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+        );
+        gsap.fromTo(".management-card form > *",
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out", delay: 0.15 }
+        );
+    }, formRef);
+    return () => ctx.revert();
+}, []);
 
 useEffect(() => {
     if (usertype !== "Admin" && localStorage.getItem("Utype") !== "Admin") {
@@ -42,7 +58,7 @@ const add=async(e)=>{
 
     return(
         <>
-        <section className="management-page">
+        <section className="management-page" ref={formRef}>
             <div className="container-fluid dashboard-shell">
                 <div className="row g-4 align-items-start">
                    <div className="col-12 col-lg-auto">

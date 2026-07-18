@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { Sidebar } from "./sidebar";
 import { Context } from "./context";
 import { useNavigate } from "react-router-dom";
+import { gsap } from "gsap";
 
 export const Dashboard = () => {
   const [equip, setallequip] = useState([]);
@@ -11,6 +12,65 @@ export const Dashboard = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { usertype } = useContext(Context);
+  const dashboardRef = useRef(null);
+
+  // Entrance animations for static shell elements
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Fade and slide down header
+      gsap.fromTo(".dashboard-header",
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+      );
+
+      // Stagger metrics cards
+      gsap.fromTo(".dashboard-metric",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out", delay: 0.1 }
+      );
+
+      // Slide up main panels
+      gsap.fromTo(".dashboard-panel",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.25 }
+      );
+    }, dashboardRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Stagger animation for dynamic cards once loading is done
+  useEffect(() => {
+    if (!loading) {
+      const ctx = gsap.context(() => {
+        // Stagger equipment cards
+        if (equip.length > 0) {
+          gsap.fromTo(".equipment-card",
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, duration: 0.4, stagger: 0.04, ease: "power2.out" }
+          );
+        }
+
+        // Stagger lab details cards
+        if (labs.length > 0) {
+          gsap.fromTo(".lab-list-item",
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, duration: 0.4, stagger: 0.04, ease: "power2.out" }
+          );
+        }
+
+        // Stagger returned items
+        if (returndata.length > 0) {
+          gsap.fromTo(".return-item",
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, duration: 0.4, stagger: 0.03, ease: "power2.out" }
+          );
+        }
+      }, dashboardRef);
+
+      return () => ctx.revert();
+    }
+  }, [loading, equip.length, labs.length, returndata.length]);
 
   useEffect(() => {
     if (usertype !== "Admin" && localStorage.getItem("Utype") !== "Admin") {
@@ -92,7 +152,7 @@ export const Dashboard = () => {
 
   return (
     <>
-      <main className="dashboard-page">
+      <main className="dashboard-page" ref={dashboardRef}>
         <div className="container-fluid dashboard-shell">
           <div className="row g-4 align-items-start">
             <div className="col-12 col-lg-auto">

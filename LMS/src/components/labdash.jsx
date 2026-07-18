@@ -1,14 +1,47 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useSearchParams } from "react-router-dom"
 import { Link } from "react-router-dom"
+import { gsap } from "gsap"
 
 export const LabDash=()=>{
+  const [data, setdata] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [searchParams] = useSearchParams()
+  const labid = searchParams.get("id")
+  const labdashRef = useRef(null)
 
+  // Entrance animations for hero
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Fade and scale down the banner slightly on entry
+      gsap.fromTo(".lab-hero",
+        { opacity: 0, y: -30, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power2.out" }
+      );
 
-const [data, setdata] = useState([])
-const [loading, setLoading] = useState(false)
-const [searchParams] = useSearchParams()
-const labid = searchParams.get("id")
+      // Stagger stats cards
+      gsap.fromTo(".stat-card",
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.08, ease: "power2.out", delay: 0.25 }
+      );
+    }, labdashRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Stagger lab list cards once loaded
+  useEffect(() => {
+    if (!loading && data.length > 0) {
+      const ctx = gsap.context(() => {
+        gsap.fromTo(".lab-card",
+          { opacity: 0, y: 25 },
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }
+        );
+      }, labdashRef);
+
+      return () => ctx.revert();
+    }
+  }, [loading, data.length]);
 
 const totalCapacity = data.reduce((total, item) => total + Number(item.Capacity || 0), 0)
 
@@ -43,7 +76,7 @@ useEffect(() => {
 
     return(
         <>
-        <div className="container mt-5 px-md-4">
+        <div className="container mt-5 px-md-4" ref={labdashRef}>
             <div className="lab-hero shadow-sm mb-4">
                 <div className="row align-items-center justify-content-between g-3">
                     <div className="col-12 col-md-7">
