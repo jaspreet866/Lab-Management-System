@@ -79,7 +79,7 @@ export const Dashboard = () => {
   }, [usertype, navigate]);
 
   const show = async () => {
-    const result = await fetch("http://localhost:9000/api/allequipments", {
+    const result = await fetch("https://lab-management-system-n3i5.onrender.com/api/allequipments", {
       method: "get",
     });
     if (result) {
@@ -93,7 +93,7 @@ export const Dashboard = () => {
   };
 
   const show2 = async () => {
-    const result = await fetch("http://localhost:9000/api/getlab", {
+    const result = await fetch("https://lab-management-system-n3i5.onrender.com/api/getlab", {
       method: "get",
     });
     if (result) {
@@ -107,7 +107,7 @@ export const Dashboard = () => {
   };
 
   const show3 = async () => {
-    const result = await fetch("http://localhost:9000/api/returndata", {
+    const result = await fetch("https://lab-management-system-n3i5.onrender.com/api/returndata", {
       method: "get",
     });
     if (result) {

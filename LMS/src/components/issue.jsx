@@ -41,7 +41,7 @@ export const Allocate = () => {
   }, []);
 
   const show = async () => {
-    const result = await fetch("http://localhost:9000/api/getlab", {
+    const result = await fetch(""https://lab-management-system-n3i5.onrender.com/api/getlab", {
       method: "get",
     });
 
@@ -53,7 +53,7 @@ export const Allocate = () => {
   };
 
   const show2 = async () => {
-    const result = await fetch("http://localhost:9000/api/allequipments", {
+    const result = await fetch(""https://lab-management-system-n3i5.onrender.com/api/allequipments", {
       method: "get",
     });
 
@@ -66,7 +66,7 @@ export const Allocate = () => {
 
   const upd = async (newquantity) => {
     const result = await fetch(
-      `http://localhost:9000/api/updateequip/${equipment}`,
+      `"https://lab-management-system-n3i5.onrender.com/api/updateequip/${equipment}`,
       {
         method: "put",
         headers: {
@@ -113,7 +113,7 @@ export const Allocate = () => {
       return;
     }
 
-    const result = await fetch("http://localhost:9000/api/allocate", {
+    const result = await fetch(""https://lab-management-system-n3i5.onrender.com/api/allocate", {
       method: "post",
       body: JSON.stringify({
         selectedLab,

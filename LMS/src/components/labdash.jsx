@@ -50,7 +50,7 @@ useEffect(() => {
         if (!labid) return
         setLoading(true)
         try {
-            const result = await fetch(`http://localhost:9000/api/getlab2/${labid}`, {
+            const result = await fetch(`"https://lab-management-system-n3i5.onrender.com/api/getlab2/${labid}`, {
                 method: "get",
             })
             if (result) {

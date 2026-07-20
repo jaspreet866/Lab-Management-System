@@ -28,7 +28,7 @@ export const Return = () => {
       alert("Please fill in all fields");
       return;
     }
-    const result = await fetch("http://localhost:9000/api/return", {
+    const result = await fetch(""https://lab-management-system-n3i5.onrender.com/api/return", {
       method: "post",
       body: JSON.stringify({ name, labname, issue }),
       headers: { "Content-type": "application/json;charset=UTF-8" },

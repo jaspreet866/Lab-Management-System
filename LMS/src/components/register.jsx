@@ -38,7 +38,7 @@ export const Register = () => {
       alert("Please fill in all fields");
       return;
     }
-    const result = await fetch("http://localhost:9000/api/register", {
+    const result = await fetch(""https://lab-management-system-n3i5.onrender.com/api/register", {
       method: "post",
       body: JSON.stringify({ name, email, pass }),
       headers: { "Content-type": "application/json;charset=UTF-8" },

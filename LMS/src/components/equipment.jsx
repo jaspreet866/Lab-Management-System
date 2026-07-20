@@ -38,7 +38,7 @@ const add=async(e)=>{
         alert("Please fill in all fields")
         return
     }
-    const result=await fetch("http://localhost:9000/api/addequipment",{
+    const result=await fetch("https://lab-management-system-n3i5.onrender.com/api/addequipment",{
         method:"post",
         body:JSON.stringify({name,quantity}),
         headers:{"Content-type":"application/json;charset=UTF-8"}

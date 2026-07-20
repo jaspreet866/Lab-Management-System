@@ -26,7 +26,7 @@ export const Header = () => {
     return () => ctx.revert();
   }, []);
   const show = async () => {
-    const result = await fetch("http://localhost:9000/api/getlab", {
+    const result = await fetch("https://lab-management-system-n3i5.onrender.com/api/getlab", {
       method: "get",
     });
     if (result) {
