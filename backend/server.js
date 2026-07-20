@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const cors = require("cors")
 const express = require("express")
 const bcrypt = require("bcrypt")
+const dotenv=require("dotenv").config()
 
 const app = express()
 
@@ -12,7 +13,7 @@ app.listen(9000, () => {
     console.log("Server is Running")
 })
 
-mongoose.connect("mongodb+srv://itannjass_db_user:k8Aip0NhAzoeIpdH@cluster0.tsjm4en.mongodb.net/LMS")
+mongoose.connect(process.env.Mongo_url)
     .then(() => console.log("Coonected to MongoDB"))
     .catch(() => console.log("Not Connected"))
 
