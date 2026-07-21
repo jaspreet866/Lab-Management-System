@@ -29,7 +29,7 @@ export const Lab=()=>{
             alert("Please fill in all fields")
             return
         }
-        const result=await fetch(""https://lab-management-system-n3i5.onrender.com/api/addlab",{
+        const result=await fetch("https://lab-management-system-n3i5.onrender.com/api/addlab",{
             method:"post",
             body:JSON.stringify({incharge,labname,capacity}),
             headers:{"Content-type":"application/json;charset=UTF-8"}
