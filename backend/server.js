@@ -7,7 +7,12 @@ const dotenv=require("dotenv").config()
 const app = express()
 
 app.use(cors({
-    origin: "https://lab-management-system-eta.vercel.app",
+    origin: [
+        "https://lab-management-system-eta.vercel.app",
+        "http://localhost:9000",
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ],
     credentials: true
 }))
 app.use(express.json())

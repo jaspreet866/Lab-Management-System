@@ -26,16 +26,21 @@ export const Header = () => {
     return () => ctx.revert();
   }, []);
   const show = async () => {
-    const result = await fetch("https://lab-management-system-n3i5.onrender.com/api/getlab", {
-      method: "get",
-    });
-    if (result) {
-      const res = await result.json();
-      if (res.statuscode === 1) {
-        setdata(res.data);
-      } else {
-        alert("Error loading labs");
+    try {
+      const result = await fetch("https://lab-management-system-n3i5.onrender.com/api/getlab", {
+        method: "get",
+      });
+      if (result) {
+        const res = await result.json();
+        if (res.statuscode === 1) {
+          setdata(res.data);
+        } else {
+          setdata([]);
+        }
       }
+    } catch (err) {
+      console.error("Error loading labs for header menu:", err);
+      setdata([]);
     }
   };
 
