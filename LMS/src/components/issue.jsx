@@ -86,9 +86,10 @@ export const Allocate = () => {
   const allocate = async (e) => {
     e.preventDefault();
 
+    const selectedLabDetails = labs.find((item) => item._id === selectedLab);
     const selectedEquipment = allequip.find((item) => item._id === equipment);
 
-    if (!selectedLab) {
+    if (!selectedLabDetails) {
       alert("Please select a lab");
       return;
     }
@@ -116,10 +117,10 @@ export const Allocate = () => {
     const result = await fetch("https://lab-management-system-n3i5.onrender.com/api/allocate", {
       method: "post",
       body: JSON.stringify({
-        selectedLab,
+        selectedLab: selectedLabDetails.LabName,
         issueDate,
         quantity,
-        equipment,
+        equipment: selectedEquipment.EquipmentName,
       }),
       headers: {
         "Content-type": "application/json",
