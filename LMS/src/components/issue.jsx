@@ -179,7 +179,7 @@ export const Allocate = () => {
                       >
                         <option value="">Select Lab</option>
                         {labs.map((a) => (
-                          <option key={a._id} value={a._id}>
+                          <option key={a._id} value={a.LabName}>
                             {a.LabName}
                           </option>
                         ))}
@@ -201,7 +201,7 @@ export const Allocate = () => {
                       >
                         <option value="">Select Equipment</option>
                         {allequip.map((a) => (
-                          <option key={a._id} value={a._id}>
+                          <option key={a._id} value={a.EquipmentName}>
                             {a.EquipmentName} ({a.Quantity} available)
                           </option>
                         ))}
