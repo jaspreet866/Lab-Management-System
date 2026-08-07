@@ -238,7 +238,7 @@ export const Dashboard = () => {
       <main className="dashboard-page" ref={dashboardRef}>
         <div className="container-fluid dashboard-shell">
           <div className="row g-4 align-items-start">
-            <div className="col-12 col-lg-auto">
+            <div className="col-12 col-lg-auto position-sticky top-0">
               <Sidebar />
             </div>
 
