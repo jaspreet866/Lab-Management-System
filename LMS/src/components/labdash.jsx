@@ -1,158 +1,209 @@
-import { useEffect, useState, useRef } from "react"
-import { useSearchParams } from "react-router-dom"
-import { Link } from "react-router-dom"
-import { gsap } from "gsap"
+import { useEffect, useState, useRef } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import { Sidebar } from "./sidebar";
+import { gsap } from "gsap";
+import { API_BASE_URL } from "../config";
 
-export const LabDash=()=>{
-  const [data, setdata] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [searchParams] = useSearchParams()
-  const labid = searchParams.get("id")
-  const labdashRef = useRef(null)
+export const LabDash = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const labid = searchParams.get("id");
+  const labdashRef = useRef(null);
 
-  // Entrance animations for hero
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Fade and scale down the banner slightly on entry
-      gsap.fromTo(".lab-hero",
-        { opacity: 0, y: -30, scale: 0.98 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power2.out" }
+      gsap.fromTo(".lab-hero-card",
+        { opacity: 0, y: -15 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
       );
-
-      // Stagger stats cards
-      gsap.fromTo(".stat-card",
-        { opacity: 0, y: 15 },
-        { opacity: 1, y: 0, duration: 0.4, stagger: 0.08, ease: "power2.out", delay: 0.25 }
+      gsap.fromTo(".lab-grid-item",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power2.out", delay: 0.1 }
       );
     }, labdashRef);
 
     return () => ctx.revert();
-  }, []);
-
-  // Stagger lab list cards once loaded
-  useEffect(() => {
-    if (!loading && data.length > 0) {
-      const ctx = gsap.context(() => {
-        gsap.fromTo(".lab-card",
-          { opacity: 0, y: 25 },
-          { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }
-        );
-      }, labdashRef);
-
-      return () => ctx.revert();
-    }
   }, [loading, data.length]);
 
-const totalCapacity = data.reduce((total, item) => total + Number(item.Capacity || 0), 0)
+  const totalCapacity = data.reduce((total, item) => total + Number(item.Capacity || 0), 0);
 
-useEffect(() => {
-    const init = async () => {
-        if (!labid) return
-        setLoading(true)
-        try {
-            const result = await fetch(`https://lab-management-system-n3i5.onrender.com/api/getlab2/${labid}`, {
-                method: "get",
-            })
-            if (result) {
-                const res = await result.json()
-                if (res.statuscode === 1) {
-                    setdata(res.data)
-                } else {
-                    setdata([])
-                }
-            }
-        } catch (err) {
-            console.error("Failed to load lab data:", err)
-            setdata([])
-        } finally {
-            setLoading(false)
+  useEffect(() => {
+    const fetchLabData = async () => {
+      setLoading(true);
+      try {
+        const url = labid
+          ? `${API_BASE_URL}/api/getlab2/${labid}`
+          : `${API_BASE_URL}/api/getlab`;
+        const result = await fetch(url, { method: "get" });
+        if (result) {
+          const res = await result.json();
+          if (res.statuscode === 1) {
+            setData(res.data || []);
+          } else {
+            setData([]);
+          }
         }
-    }
+      } catch (err) {
+        console.error("Failed to load lab data:", err);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    init()
-}, [labid])
+    fetchLabData();
+  }, [labid]);
 
+  return (
+    <main className="dashboard-page" ref={labdashRef}>
+      <div className="container-fluid dashboard-shell px-3 px-md-4 py-3">
+        <div className="row g-4 align-items-start">
+          <div className="col-12 col-lg-auto position-sticky" style={{ top: "90px", zIndex: 10 }}>
+            <Sidebar />
+          </div>
 
-
-    return(
-        <>
-        <div className="container mt-5 px-md-4" ref={labdashRef}>
-            <div className="lab-hero shadow-sm mb-4">
-                <div className="row align-items-center justify-content-between g-3">
-                    <div className="col-12 col-md-7">
-                        <span className="section-kicker text-white-50">Analytics</span>
-                        <h1 className="mb-2">Lab Dashboard</h1>
-                        <p className="mb-0 text-white-50">Overview of laboratory infrastructure, metrics, and device allocations.</p>
-                    </div>
-                    
-                    <div className="col-12 col-md-5">
-                        <div className="stats-row justify-content-md-end">
-                            <div className="stat-card">
-                                <div className="stat-label">Active Entries</div>
-                                <div className="stat-value">{data.length}</div>
-                            </div>
-                            <div className="stat-card">
-                                <div className="stat-label">Total Capacity</div>
-                                <div className="stat-value">{totalCapacity}</div>
-                            </div>
-                        </div>
-                    </div>
+          <div className="col">
+            {/* HERO BANNER */}
+            <div className="lab-hero-card mb-4 p-4 rounded-4 shadow-sm border">
+              <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <span className="badge bg-teal-subtle text-teal px-2.5 py-1">
+                      <i className="bi bi-diagram-3 me-1"></i> FACILITY TELEMETRY
+                    </span>
+                    <span className="text-muted small">
+                      {labid ? "Single Facility View" : "All Registered Laboratories"}
+                    </span>
+                  </div>
+                  <h1 className="h3 fw-bold mb-1">
+                    {labid && data.length > 0 ? `${data[0].LabName} Dashboard` : "Laboratory Infrastructure"}
+                  </h1>
+                  <p className="text-muted small mb-0">
+                    Workstation occupancy, supervising faculty incharge, and quick equipment allocation shortcuts.
+                  </p>
                 </div>
+
+                <div className="d-flex flex-wrap align-items-center gap-2">
+                  <div className="p-2.5 px-3 rounded-3 bg-light text-center">
+                    <span className="d-block text-muted" style={{ fontSize: "0.72rem" }}>Active Rooms</span>
+                    <strong className="h5 fw-bold text-themed-main mb-0">{data.length}</strong>
+                  </div>
+                  <div className="p-2.5 px-3 rounded-3 bg-light text-center">
+                    <span className="d-block text-muted" style={{ fontSize: "0.72rem" }}>Total Capacity</span>
+                    <strong className="h5 fw-bold text-primary mb-0">{totalCapacity}</strong>
+                  </div>
+                  <Link to="/lab" className="btn btn-sm btn-primary d-flex align-items-center gap-1.5 px-3 py-2">
+                    <i className="bi bi-plus-lg"></i>
+                    <span>Add Facility</span>
+                  </Link>
+                </div>
+              </div>
             </div>
 
-            <div className="row">
-                <div className="col-12">
-                    {loading ? (
-                        <div className="d-flex flex-column align-items-center justify-content-center my-5 py-5 text-muted">
-                            <div className="spinner-border text-primary mb-3" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
-                            <span>Retrieving laboratory records...</span>
-                        </div>
-                    ) : data.length === 0 ? (
-                        <div className="alert alert-info d-flex align-items-center gap-3 shadow-sm border-0 py-3" role="alert">
-                            <i className="bi bi-info-circle-fill text-info fs-4"></i>
-                            <div>No laboratory records found for this ID. Select a valid lab from the header dropdown menu.</div>
-                        </div>
-                    ) : (
-                        <div className="row g-4">
-                            {data.map((a) => (
-                                <div className="col-12 col-md-6 col-lg-4" key={a._id || a.LabName}>
-                                    <div className="card lab-card h-100 border-0">
-                                        <div className="card-body d-flex flex-column justify-content-between">
-                                            <div>
-                                                <h5 className="card-title lab-title d-flex align-items-center gap-2">
-                                                    <i className="bi bi-door-closed text-primary"></i>
-                                                    <span>{a.LabName}</span>
-                                                </h5>
-                                                
-                                                <div className="mt-3">
-                                                    <div className="d-flex align-items-center gap-2 mb-2 text-secondary">
-                                                        <i className="bi bi-person-vcard text-muted"></i>
-                                                        <span className="small">Incharge: <strong>{a.LabIncharge}</strong></span>
-                                                    </div>
-                                                    <div className="d-flex align-items-center gap-2 text-secondary">
-                                                        <i className="bi bi-people text-muted"></i>
-                                                        <span className="small">Max Students: <strong>{a.Capacity}</strong></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-4 pt-3 border-top d-flex justify-content-end">
-                                                <Link to="/return" className="btn btn-return d-flex align-items-center gap-2">
-                                                    <i className="bi bi-arrow-down-left-circle"></i>
-                                                    <span>Return a Device</span>
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+            {/* LAB CARDS GRID */}
+            {loading ? (
+              <div className="d-flex flex-column align-items-center justify-content-center my-5 py-5 text-muted">
+                <div className="spinner-border text-primary mb-3" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
-            </div>
+                <span className="small">Retrieving laboratory records...</span>
+              </div>
+            ) : data.length === 0 ? (
+              <div className="p-5 text-center rounded-4 bg-card border shadow-sm my-4">
+                <i className="bi bi-building-x text-muted fs-1 mb-2 d-block"></i>
+                <h5 className="fw-bold mb-1">No laboratory records found</h5>
+                <p className="text-muted small mb-3">Get started by creating your first lab facility.</p>
+                <Link to="/lab" className="btn btn-sm btn-primary">
+                  <i className="bi bi-plus-lg me-1"></i> Setup New Lab
+                </Link>
+              </div>
+            ) : (
+              <div className="row g-4">
+                {data.map((item) => {
+                  const cap = Number(item.Capacity || 0);
+                  return (
+                    <div className="col-12 col-md-6 col-xl-4 lab-grid-item" key={item._id || item.LabName}>
+                      <div className="lab-facility-card p-4 rounded-4 shadow-sm border h-100 d-flex flex-column justify-content-between">
+                        <div>
+                          {/* Header */}
+                          <div className="d-flex align-items-center justify-content-between mb-3">
+                            <div className="d-flex align-items-center gap-2.5">
+                              <div className="lab-card-icon bg-teal-subtle text-teal">
+                                <i className="bi bi-building"></i>
+                              </div>
+                              <div>
+                                <h5 className="fw-bold mb-0 text-themed-main">{item.LabName}</h5>
+                                <span className="text-muted" style={{ fontSize: "0.72rem" }}>
+                                  ID: {(item._id || "").slice(-6).toUpperCase() || "LAB-01"}
+                                </span>
+                              </div>
+                            </div>
+                            <span className="badge bg-success-subtle text-success px-2.5 py-1">
+                              Operational
+                            </span>
+                          </div>
+
+                          {/* Facility details */}
+                          <div className="asset-specs-grid p-3 rounded-3 mb-3">
+                            <div className="d-flex align-items-center justify-content-between mb-2">
+                              <span className="small text-muted">Supervising Lead:</span>
+                              <strong className="small text-themed-main">{item.LabIncharge || "Unassigned"}</strong>
+                            </div>
+                            <div className="d-flex align-items-center justify-content-between mb-2">
+                              <span className="small text-muted">Max Capacity:</span>
+                              <span className="fw-bold small text-primary">{cap} Workbenches</span>
+                            </div>
+                            <div className="d-flex align-items-center justify-content-between">
+                              <span className="small text-muted">Facility Status:</span>
+                              <span className="small text-success fw-semibold">
+                                <span className="pulse-dot me-1"></span> Available
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Capacity meter */}
+                          <div className="mb-3">
+                            <div className="d-flex justify-content-between text-muted" style={{ fontSize: "0.72rem" }}>
+                              <span>Capacity Utilization</span>
+                              <span>{cap > 50 ? "High Capacity" : cap > 25 ? "Standard" : "Compact"}</span>
+                            </div>
+                            <div className="progress mt-1" style={{ height: "6px" }}>
+                              <div
+                                className="progress-bar bg-teal"
+                                role="progressbar"
+                                style={{ width: `${Math.min(cap * 1.8, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="d-flex align-items-center justify-content-between pt-2">
+                          <Link
+                            to="/allocate"
+                            className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5"
+                          >
+                            <i className="bi bi-box-arrow-up"></i>
+                            <span>Issue Stock</span>
+                          </Link>
+                          <Link
+                            to="/return"
+                            className="btn btn-sm btn-primary d-flex align-items-center gap-1.5"
+                          >
+                            <i className="bi bi-arrow-return-left"></i>
+                            <span>Return Device</span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
-        </>
-    )
-}
+      </div>
+    </main>
+  );
+};
