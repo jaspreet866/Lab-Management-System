@@ -1,10 +1,22 @@
-import { useContext, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Sidebar } from "./sidebar";
-import { useNavigate, Link } from "react-router-dom";
-import { Context } from "./context";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { API_BASE_URL } from "../config";
-import { useToast } from "./ToastContext";
+import { useToast } from "./useToast";
+import { useRequireRole } from "./useRequireRole";
+
+// Returns the list from an endpoint, or an empty list when it cannot be loaded
+const fetchList = async (path) => {
+  try {
+    const result = await fetch(`${API_BASE_URL}${path}`, { method: "get" });
+    const res = await result.json();
+    return res.statuscode === 1 ? res.data || [] : [];
+  } catch (err) {
+    console.error(`Failed to load ${path}:`, err);
+    return [];
+  }
+};
 
 export const Allocate = () => {
   const [labs, setLabs] = useState([]);
@@ -14,9 +26,7 @@ export const Allocate = () => {
   const [allequip, setAllequip] = useState([]);
   const [equipment, setEquipment] = useState("");
   const [loading, setLoading] = useState(false);
-  const { usertype } = useContext(Context);
   const { success, error, warning } = useToast();
-  const navigate = useNavigate();
   const formRef = useRef(null);
 
   useEffect(() => {
@@ -37,36 +47,19 @@ export const Allocate = () => {
     return () => ctx.revert();
   }, []);
 
-  useEffect(() => {
-    if (usertype !== "Admin" && localStorage.getItem("Utype") !== "Admin") {
-      navigate("/");
-    }
-  }, [usertype, navigate]);
+  useRequireRole(["Admin"]);
 
   useEffect(() => {
-    show();
-    show2();
+    let cancelled = false;
+    Promise.all([fetchList("/api/getlab"), fetchList("/api/allequipments")]).then(([labList, equipList]) => {
+      if (cancelled) return;
+      setLabs(labList);
+      setAllequip(equipList);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
-
-  const show = async () => {
-    try {
-      const result = await fetch(`${API_BASE_URL}/api/getlab`, { method: "get" });
-      const res = await result.json();
-      if (res.statuscode === 1) setLabs(res.data || []);
-    } catch (err) {
-      console.error("Get lab error:", err);
-    }
-  };
-
-  const show2 = async () => {
-    try {
-      const result = await fetch(`${API_BASE_URL}/api/allequipments`, { method: "get" });
-      const res = await result.json();
-      if (res.statuscode === 1) setAllequip(res.data || []);
-    } catch (err) {
-      console.error("Get equipments error:", err);
-    }
-  };
 
   const upd = async (newquantity) => {
     try {
@@ -137,7 +130,7 @@ export const Allocate = () => {
         setQuantity("");
 
         // Refresh equipment list
-        show2();
+        setAllequip(await fetchList("/api/allequipments"));
       } else {
         error(res.message || "Allocation failed. Please check server logs.");
       }
@@ -161,7 +154,7 @@ export const Allocate = () => {
       <section className="management-page" ref={formRef}>
         <div className="container-fluid dashboard-shell px-3 px-md-4 py-3">
           <div className="row g-4 align-items-start">
-            <div className="col-12 col-lg-auto position-sticky" style={{ top: "90px", zIndex: 10 }}>
+            <div className="col-12 col-lg-auto app-sidebar-col">
               <Sidebar />
             </div>
 
@@ -171,7 +164,7 @@ export const Allocate = () => {
                 <div>
                   <div className="d-flex align-items-center gap-2 mb-1 form-hero-badge">
                     <span className="badge bg-purple-subtle text-purple px-2.5 py-1">
-                      <i className="bi bi-box-arrow-up-right me-1"></i> LOGISTICS & DISPATCH
+                      <i className="bi bi-box-arrow-up-right me-1"></i> Logistics & dispatch
                     </span>
                     <span className="text-muted small">Equipment Allocation</span>
                   </div>

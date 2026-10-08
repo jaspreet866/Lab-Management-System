@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Context } from "./context";
 import { gsap } from "gsap";
 import { API_BASE_URL } from "../config";
-import { useToast } from "./ToastContext";
+import { useToast } from "./useToast";
 
 export const Header = () => {
   const [data, setdata] = useState([]);
@@ -31,46 +31,52 @@ export const Header = () => {
     return () => ctx.revert();
   }, []);
 
-  const show = async () => {
-    try {
-      const result = await fetch(`${API_BASE_URL}/api/getlab`, {
-        method: "get",
-      });
-      if (result) {
-        const res = await result.json();
-        if (res.statuscode === 1) {
-          setdata(res.data);
-        } else {
-          setdata([]);
-        }
-      }
-    } catch (err) {
-      console.error("Error loading labs for header menu:", err);
-      setdata([]);
-    }
-  };
-
+  // Reload the lab menu on navigation so a newly created lab shows up straight away
   useEffect(() => {
-    show();
-  }, []);
+    let cancelled = false;
+    const loadLabs = async () => {
+      try {
+        const result = await fetch(`${API_BASE_URL}/api/getlab`, { method: "get" });
+        const res = await result.json();
+        if (!cancelled) setdata(res.statuscode === 1 ? res.data || [] : []);
+      } catch (err) {
+        console.error("Error loading labs for header menu:", err);
+        if (!cancelled) setdata([]);
+      }
+    };
+    loadLabs();
+    return () => {
+      cancelled = true;
+    };
+  }, [location.pathname]);
+
+  // Close the mobile menu after navigating
+  useEffect(() => {
+    const menu = document.getElementById("navbarSupportedContent");
+    if (menu && menu.classList.contains("show") && window.bootstrap) {
+      window.bootstrap.Collapse.getOrCreateInstance(menu).hide();
+    }
+  }, [location.pathname, location.search]);
 
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem("Utype");
+    localStorage.removeItem("lms_auth_token");
+    localStorage.removeItem("lms_user");
     setusertype("Guest");
     info("You have been signed out.");
     navigate("/");
   };
 
-  const currentRole = localStorage.getItem("Utype") || usertype;
+  const currentRole = usertype;
   const isLoggedIn = currentRole === "Admin" || currentRole === "User";
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg sticky-top" ref={headerRef}>
+      <nav className="navbar navbar-expand-xl sticky-top" ref={headerRef}>
         <div className="container-fluid header-shell px-md-4">
-          <div className="d-flex align-items-center gap-3">
+          <div className="d-flex align-items-center gap-3 flex-grow-1 flex-xl-grow-0">
             <button
-              className="navbar-toggler border-0 shadow-none d-lg-none"
+              className="navbar-toggler border-0 shadow-none d-xl-none"
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#navbarSupportedContent"
@@ -92,6 +98,7 @@ export const Header = () => {
               className="btn cmd-trigger-btn d-none d-md-flex align-items-center gap-2"
               onClick={openCmdPalette}
               title="Quick Search & Actions (⌘K)"
+              aria-label="Open command palette"
             >
               <i className="bi bi-search text-muted small"></i>
               <span className="cmd-trigger-text text-muted">Search or jump to...</span>
@@ -103,9 +110,10 @@ export const Header = () => {
             className="collapse navbar-collapse align-items-center"
             id="navbarSupportedContent"
           >
-            <ul className="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-center">
+            <ul className="navbar-nav ms-auto mb-2 mb-xl-0 gap-xl-2 align-items-center">
+              {/* Page links below are also in the sidebar, so on desktop they only appear in the collapsed menu */}
               {isLoggedIn && (
-                <li className="nav-item">
+                <li className="nav-item d-xl-none">
                   <Link to="/dashboard" className={`nav-link ${location.pathname === "/dashboard" ? "active" : ""}`}>
                     <i className="bi bi-grid-1x2"></i>
                     <span>Dashboard</span>
@@ -114,11 +122,17 @@ export const Header = () => {
               )}
               
               <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="bi bi-collection"></i>
-                  <span>Lab Dashboards</span>
+                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" onClick={(e) => e.preventDefault()}>
+                  <i className="bi bi-signpost-split"></i>
+                  <span>Jump to lab</span>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end shadow-sm">
+                  <li>
+                    <Link className="dropdown-item" to="/labdash">
+                      <i className="bi bi-grid me-1 small opacity-75"></i> All laboratories
+                    </Link>
+                  </li>
+                  {data.length > 0 && <li><hr className="dropdown-divider" /></li>}
                   {data.map((a) => (
                     <li key={a._id || a.LabName}>
                       <Link className="dropdown-item" to={`/labdash?id=${a._id}`}>
@@ -136,19 +150,19 @@ export const Header = () => {
 
               {currentRole === "Admin" && (
                 <>
-                  <li className="nav-item">
+                  <li className="nav-item d-xl-none">
                     <Link className={`nav-link ${location.pathname === "/allocate" ? "active" : ""}`} to="/allocate">
                       <i className="bi bi-box-arrow-up"></i>
                       <span>Issue</span>
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li className="nav-item d-xl-none">
                     <Link className={`nav-link ${location.pathname === "/equipment" ? "active" : ""}`} to="/equipment">
                       <i className="bi bi-plus-circle"></i>
                       <span>Add Equipment</span>
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li className="nav-item d-xl-none">
                     <Link className={`nav-link ${location.pathname === "/lab" ? "active" : ""}`} to="/lab">
                       <i className="bi bi-building-add"></i>
                       <span>Add Lab</span>
@@ -158,7 +172,7 @@ export const Header = () => {
               )}
 
               {isLoggedIn && (
-                <li className="nav-item">
+                <li className="nav-item d-xl-none">
                   <Link className={`nav-link ${location.pathname === "/return" ? "active" : ""}`} to="/return">
                     <i className="bi bi-arrow-return-left"></i>
                     <span>Return</span>
@@ -167,11 +181,12 @@ export const Header = () => {
               )}
 
               {/* Theme Toggle Button */}
-              <li className="nav-item ms-lg-1">
+              <li className="nav-item ms-xl-1">
                 <button
                   className="btn btn-theme-toggle d-flex align-items-center gap-1.5"
                   onClick={toggleTheme}
                   title={`Switch to ${theme === "light" ? "Dark" : "Light"} Mode`}
+                  aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
                   type="button"
                 >
                   <i className={`bi ${theme === "light" ? "bi-moon-stars-fill text-primary" : "bi-sun-fill text-warning"}`}></i>
@@ -181,13 +196,13 @@ export const Header = () => {
 
               {isLoggedIn ? (
                 <>
-                  <li className="nav-item ms-lg-1">
+                  <li className="nav-item ms-xl-1">
                     <span className={`badge role-pill ${currentRole === "Admin" ? "role-admin" : "role-user"}`}>
                       <i className={`bi ${currentRole === "Admin" ? "bi-shield-check" : "bi-person-check"} me-1`}></i>
                       {currentRole}
                     </span>
                   </li>
-                  <li className="nav-item ms-lg-1">
+                  <li className="nav-item ms-xl-1">
                     <button className="btn logbtn d-flex align-items-center gap-2" type="button" onClick={logout}>
                       <i className="bi bi-box-arrow-right"></i>
                       <span>Logout</span>
@@ -195,7 +210,7 @@ export const Header = () => {
                   </li>
                 </>
               ) : (
-                <li className="nav-item ms-lg-2">
+                <li className="nav-item ms-xl-2">
                   <Link className="btn btn-primary btn-sm d-flex align-items-center gap-1 px-3 py-1.5" to="/">
                     <i className="bi bi-box-arrow-in-right"></i>
                     <span>Sign In</span>

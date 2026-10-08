@@ -1,15 +1,19 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "./context";
-import { useToast } from "./ToastContext";
+import { useToast } from "./useToast";
 
-export const CommandPalette = ({ isOpen, onClose }) => {
+// Mounted only while the palette is open, so query and selection reset on every open
+const PaletteDialog = ({ onClose }) => {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const inputRef = useRef(null);
+  const activeItemRef = useRef(null);
   const navigate = useNavigate();
   const { theme, toggleTheme, usertype, setusertype } = useContext(Context);
   const { info, success } = useToast();
+
+  const isAdmin = usertype === "Admin";
+  const isLoggedIn = isAdmin || usertype === "User";
 
   const commands = [
     {
@@ -18,7 +22,17 @@ export const CommandPalette = ({ isOpen, onClose }) => {
       category: "Navigation",
       icon: "bi-grid-1x2-fill",
       badge: "Page",
+      visible: isLoggedIn,
       action: () => navigate("/dashboard"),
+    },
+    {
+      id: "nav-labdash",
+      title: "Browse Lab Dashboards",
+      category: "Navigation",
+      icon: "bi-collection-fill",
+      badge: "Page",
+      visible: true,
+      action: () => navigate("/labdash"),
     },
     {
       id: "nav-equipment",
@@ -26,6 +40,7 @@ export const CommandPalette = ({ isOpen, onClose }) => {
       category: "Actions",
       icon: "bi-plus-circle-fill",
       badge: "Admin",
+      visible: isAdmin,
       action: () => navigate("/equipment"),
     },
     {
@@ -34,6 +49,7 @@ export const CommandPalette = ({ isOpen, onClose }) => {
       category: "Actions",
       icon: "bi-building-fill-gear",
       badge: "Admin",
+      visible: isAdmin,
       action: () => navigate("/lab"),
     },
     {
@@ -42,6 +58,7 @@ export const CommandPalette = ({ isOpen, onClose }) => {
       category: "Actions",
       icon: "bi-box-arrow-up-right",
       badge: "Admin",
+      visible: isAdmin,
       action: () => navigate("/allocate"),
     },
     {
@@ -50,18 +67,29 @@ export const CommandPalette = ({ isOpen, onClose }) => {
       category: "Actions",
       icon: "bi-arrow-return-left",
       badge: "Action",
+      visible: isLoggedIn,
       action: () => navigate("/return"),
     },
     {
       id: "action-theme",
-      title: `Switch to ${theme === "light" ? "Dark Mode 🌙" : "Light Mode ☀️"}`,
+      title: `Switch to ${theme === "light" ? "Dark Mode" : "Light Mode"}`,
       category: "Preferences",
       icon: theme === "light" ? "bi-moon-stars-fill" : "bi-sun-fill",
       badge: "Theme",
+      visible: true,
       action: () => {
         toggleTheme();
         success(`Switched to ${theme === "light" ? "Dark" : "Light"} mode`);
       },
+    },
+    {
+      id: "action-login",
+      title: "Sign In to LabFlow",
+      category: "Account",
+      icon: "bi-box-arrow-in-right",
+      badge: "Auth",
+      visible: !isLoggedIn,
+      action: () => navigate("/"),
     },
     {
       id: "action-logout",
@@ -69,8 +97,11 @@ export const CommandPalette = ({ isOpen, onClose }) => {
       category: "Account",
       icon: "bi-box-arrow-right",
       badge: "Auth",
+      visible: isLoggedIn,
       action: () => {
-        localStorage.clear();
+        localStorage.removeItem("Utype");
+        localStorage.removeItem("lms_auth_token");
+        localStorage.removeItem("lms_user");
         setusertype("Guest");
         info("Signed out successfully");
         navigate("/");
@@ -78,24 +109,21 @@ export const CommandPalette = ({ isOpen, onClose }) => {
     },
   ];
 
-  const filteredCommands = commands.filter((cmd) =>
-    cmd.title.toLowerCase().includes(query.toLowerCase()) ||
-    cmd.category.toLowerCase().includes(query.toLowerCase())
+  const needle = query.trim().toLowerCase();
+  const filteredCommands = commands.filter(
+    (cmd) =>
+      cmd.visible &&
+      (cmd.title.toLowerCase().includes(needle) || cmd.category.toLowerCase().includes(needle))
   );
 
   useEffect(() => {
-    if (isOpen) {
-      setQuery("");
-      setSelectedIndex(0);
-      setTimeout(() => {
-        if (inputRef.current) inputRef.current.focus();
-      }, 50);
-    }
-  }, [isOpen]);
+    if (activeItemRef.current) activeItemRef.current.scrollIntoView({ block: "nearest" });
+  }, [selectedIndex]);
 
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
+  const runCommand = (cmd) => {
+    cmd.action();
+    onClose();
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === "ArrowDown") {
@@ -110,37 +138,39 @@ export const CommandPalette = ({ isOpen, onClose }) => {
       );
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (filteredCommands[selectedIndex]) {
-        filteredCommands[selectedIndex].action();
-        onClose();
-      }
+      if (filteredCommands[selectedIndex]) runCommand(filteredCommands[selectedIndex]);
     } else if (e.key === "Escape") {
       onClose();
     }
   };
 
-  if (!isOpen) return null;
-
   return (
     <div className="cmd-palette-backdrop" onClick={onClose}>
       <div
         className="cmd-palette-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
         <div className="cmd-header">
           <i className="bi bi-search cmd-search-icon"></i>
           <input
-            ref={inputRef}
+            autoFocus
             type="text"
             className="cmd-input"
-            placeholder="Type a command or search pages (e.g., Dashboard, Add, Theme)..."
+            placeholder="Type a command or search pages..."
+            aria-label="Search commands"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
           />
-          <span className="cmd-badge-esc" onClick={onClose}>
+          <button type="button" className="cmd-badge-esc" onClick={onClose}>
             ESC
-          </span>
+          </button>
         </div>
 
         <div className="cmd-list-container">
@@ -149,11 +179,9 @@ export const CommandPalette = ({ isOpen, onClose }) => {
               {filteredCommands.map((cmd, index) => (
                 <li
                   key={cmd.id}
+                  ref={index === selectedIndex ? activeItemRef : null}
                   className={`cmd-item ${index === selectedIndex ? "active" : ""}`}
-                  onClick={() => {
-                    cmd.action();
-                    onClose();
-                  }}
+                  onClick={() => runCommand(cmd)}
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
                   <div className="cmd-item-left">
@@ -176,7 +204,7 @@ export const CommandPalette = ({ isOpen, onClose }) => {
             </ul>
           ) : (
             <div className="cmd-empty">
-              <i className="bi bi-search-heart mb-2 fs-4 text-muted"></i>
+              <i className="bi bi-search-heart mb-2 fs-4 text-muted d-block"></i>
               <p className="mb-0 text-muted small">No commands or pages found for "{query}"</p>
             </div>
           )}
@@ -195,4 +223,9 @@ export const CommandPalette = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
+};
+
+export const CommandPalette = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+  return <PaletteDialog onClose={onClose} />;
 };

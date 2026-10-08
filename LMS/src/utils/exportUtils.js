@@ -1,15 +1,13 @@
 /**
- * Utility to convert data arrays into CSV and trigger browser download
+ * Utility to convert data arrays into CSV and trigger browser download.
+ * Returns false when there is nothing to export.
  */
 export const exportToCSV = (data, filename = "lab_export.csv", customHeaders = null) => {
-  if (!data || !data.length) {
-    alert("No data available to export");
-    return;
-  }
+  if (!data || !data.length) return false;
 
   // Extract keys or use custom headers mapping
   const keys = Object.keys(data[0]).filter(k => k !== "__v");
-  
+
   const headers = customHeaders || keys;
   const headerRow = headers.join(",");
 
@@ -24,12 +22,15 @@ export const exportToCSV = (data, filename = "lab_export.csv", customHeaders = n
     }).join(",");
   });
 
-  const csvContent = "data:text/csv;charset=utf-8," + [headerRow, ...rows].join("\n");
-  const encodedUri = encodeURI(csvContent);
+  // Blob download: a data: URI would be cut off at the first "#" in the data
+  const blob = new Blob([[headerRow, ...rows].join("\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
+  link.setAttribute("href", url);
   link.setAttribute("download", filename);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  return true;
 };

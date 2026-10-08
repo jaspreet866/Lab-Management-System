@@ -1,5 +1,3 @@
-import React from "react";
-
 export const StatCardSkeleton = () => (
   <div className="stat-card skeleton-stat-card">
     <div className="skeleton-line skeleton-icon"></div>

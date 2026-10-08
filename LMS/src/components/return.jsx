@@ -3,7 +3,10 @@ import { Sidebar } from "./sidebar";
 import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { API_BASE_URL } from "../config";
-import { useToast } from "./ToastContext";
+import { useToast } from "./useToast";
+import { useRequireRole } from "./useRequireRole";
+
+const newTicketId = () => `RTN-${Math.floor(1000 + Math.random() * 9000)}`;
 
 export const Return = () => {
   const [name, setName] = useState("");
@@ -11,8 +14,12 @@ export const Return = () => {
   const [issue, setIssue] = useState("None / Working fine");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  // Generated once per ticket so the preview ID stays put while typing
+  const [ticketId, setTicketId] = useState(newTicketId);
   const { success, error, warning } = useToast();
   const formRef = useRef(null);
+
+  useRequireRole(["Admin", "User"]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -54,6 +61,7 @@ export const Return = () => {
           setLabname("");
           setIssue("None / Working fine");
           setNotes("");
+          setTicketId(newTicketId());
         } else {
           error(res.message || "Failed to record return report");
         }
@@ -74,7 +82,7 @@ export const Return = () => {
       <section className="management-page" ref={formRef}>
         <div className="container-fluid dashboard-shell px-3 px-md-4 py-3">
           <div className="row g-4 align-items-start">
-            <div className="col-12 col-lg-auto position-sticky" style={{ top: "90px", zIndex: 10 }}>
+            <div className="col-12 col-lg-auto app-sidebar-col">
               <Sidebar />
             </div>
 
@@ -84,7 +92,7 @@ export const Return = () => {
                 <div>
                   <div className="d-flex align-items-center gap-2 mb-1 form-hero-badge">
                     <span className="badge bg-amber-subtle text-amber px-2.5 py-1">
-                      <i className="bi bi-arrow-return-left me-1"></i> LOGISTICS & MAINTENANCE
+                      <i className="bi bi-arrow-return-left me-1"></i> Logistics & maintenance
                     </span>
                     <span className="text-muted small">Device Check-In</span>
                   </div>
@@ -168,10 +176,10 @@ export const Return = () => {
                             onChange={(e) => setIssue(e.target.value)}
                             required
                           >
-                            <option value="None / Working fine">✨ Normal Return — Working Fine</option>
-                            <option value="Wire Problem">🔌 Wire / Cable Problem</option>
-                            <option value="Not Working">⚡ Not Working / Power Failure</option>
-                            <option value="Damage of Parts">💥 Physical Damage of Parts</option>
+                            <option value="None / Working fine">Normal Return — Working Fine</option>
+                            <option value="Wire Problem">Wire / Cable Problem</option>
+                            <option value="Not Working">Not Working / Power Failure</option>
+                            <option value="Damage of Parts">Physical Damage of Parts</option>
                           </select>
                         </div>
                       </div>
@@ -247,12 +255,13 @@ export const Return = () => {
                         </div>
                         <div className="d-flex justify-content-between mb-1.5">
                           <span className="text-muted small">Ticket Tracking ID:</span>
-                          <span className="font-monospace small text-muted">RTN-{Math.floor(1000 + Math.random() * 9000)}</span>
+                          <span className="font-monospace small text-muted">{ticketId}</span>
                         </div>
                         <div className="d-flex justify-content-between mb-1.5">
                           <span className="text-muted small">Triage Routing:</span>
                           <span className="fw-semibold small text-themed-main">
-                            {isSevere ? "⚠️ Technician Repair Bay" : "✅ Restock to Central Store"}
+                            <i className={`bi ${isSevere ? "bi-tools text-danger" : "bi-check-circle-fill text-success"} me-1`}></i>
+                            {isSevere ? "Technician Repair Bay" : "Restock to Central Store"}
                           </span>
                         </div>
                         {notes.trim() && (

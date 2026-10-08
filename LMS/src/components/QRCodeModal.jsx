@@ -1,16 +1,23 @@
-import React, { useRef } from "react";
+// Asset names are user input and get written into the print window as raw HTML
+const escapeHtml = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 
 export const QRCodeModal = ({ equipment, item, isOpen, onClose }) => {
-  const printRef = useRef(null);
   const targetItem = equipment || item;
 
   if (!isOpen || !targetItem) return null;
 
+  const assetName = targetItem.EquipmentName || "Equipment";
+  const assetQty = Number(targetItem.Quantity || 0);
+  // Derived from stock so older records with a misspelled stored status still read correctly
+  const assetStatus = assetQty > 0 ? "Available" : "Out of Stock";
+  const safeName = escapeHtml(assetName);
+
   const qrPayload = JSON.stringify({
     assetId: targetItem._id || "N/A",
-    name: targetItem.EquipmentName || "Equipment",
-    status: targetItem.Status || "Available",
-    qty: targetItem.Quantity || 0,
+    name: assetName,
+    status: assetStatus,
+    qty: assetQty,
     system: "LMS-Asset-Tag"
   });
 
@@ -29,7 +36,7 @@ export const QRCodeModal = ({ equipment, item, isOpen, onClose }) => {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Asset Tag - ${targetItem.EquipmentName}</title>
+          <title>Asset Tag - ${safeName}</title>
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -61,10 +68,10 @@ export const QRCodeModal = ({ equipment, item, isOpen, onClose }) => {
             <div class="subtitle">Lab Management System</div>
             <img class="qr-img" src="${qrImageUrl}" alt="QR Code" />
             <div class="meta">
-              <div><strong>Asset:</strong> <span>${targetItem.EquipmentName}</span></div>
-              <div><strong>ID:</strong> <span style="font-family: monospace;">${(targetItem._id || "").slice(-8)}</span></div>
-              <div><strong>Quantity:</strong> <span>${targetItem.Quantity}</span></div>
-              <div><strong>Status:</strong> <span>${targetItem.Status || "Available"}</span></div>
+              <div><strong>Asset:</strong> <span>${safeName}</span></div>
+              <div><strong>ID:</strong> <span style="font-family: monospace;">${escapeHtml((targetItem._id || "").slice(-8))}</span></div>
+              <div><strong>Quantity:</strong> <span>${assetQty}</span></div>
+              <div><strong>Status:</strong> <span>${assetStatus}</span></div>
             </div>
           </div>
           <script>
@@ -86,32 +93,32 @@ export const QRCodeModal = ({ equipment, item, isOpen, onClose }) => {
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = `QR_${targetItem.EquipmentName.replace(/\s+/g, "_")}.svg`;
+      link.download = `QR_${assetName.replace(/\s+/g, "_")}.svg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
-    } catch (err) {
+    } catch {
       window.open(qrImageUrl, "_blank");
     }
   };
 
   return (
     <div className="lms-modal-backdrop" onClick={onClose}>
-      <div className="lms-modal-card" onClick={(e) => e.stopPropagation()}>
+      <div className="lms-modal-card" role="dialog" aria-modal="true" aria-label={`QR asset tag for ${assetName}`} onClick={(e) => e.stopPropagation()}>
         <div className="lms-modal-header d-flex align-items-center justify-content-between p-3 border-bottom">
           <div className="d-flex align-items-center gap-2">
             <i className="bi bi-qr-code text-primary fs-5"></i>
             <div>
-              <h6 className="mb-0 fw-bold">{targetItem.EquipmentName}</h6>
+              <h6 className="mb-0 fw-bold">{assetName}</h6>
               <small className="text-muted">Asset ID: {(targetItem._id || "").slice(-8).toUpperCase()}</small>
             </div>
           </div>
-          <button className="btn-close" onClick={onClose} aria-label="Close"></button>
+          <button type="button" className="btn-close" onClick={onClose} aria-label="Close"></button>
         </div>
 
-        <div className="lms-modal-body text-center p-4" ref={printRef}>
-          <div className="qr-badge-preview p-3 mx-auto rounded-3 mb-3 bg-white border d-inline-block">
+        <div className="lms-modal-body text-center p-4">
+          <div className="qr-badge-preview p-3 mx-auto rounded-3 mb-3 d-inline-block">
             <img
               src={qrImageUrl}
               alt="Asset QR Code"
@@ -121,15 +128,15 @@ export const QRCodeModal = ({ equipment, item, isOpen, onClose }) => {
             <div className="asset-details text-start p-2.5 rounded-2 mt-2" style={{ backgroundColor: "#f1f5f9", color: "#0f172a" }}>
               <div className="d-flex justify-content-between mb-1">
                 <span className="small" style={{ color: "#475569" }}>Asset Name:</span>
-                <span className="fw-bold small" style={{ color: "#0f172a" }}>{targetItem.EquipmentName}</span>
+                <span className="fw-bold small text-end ms-3" style={{ color: "#0f172a" }}>{assetName}</span>
               </div>
               <div className="d-flex justify-content-between mb-1">
                 <span className="small" style={{ color: "#475569" }}>Inventory Qty:</span>
-                <span className="badge bg-primary">{targetItem.Quantity} units</span>
+                <span className="badge qr-qty-badge">{assetQty} units</span>
               </div>
               <div className="d-flex justify-content-between">
                 <span className="small" style={{ color: "#475569" }}>Status:</span>
-                <span className="badge bg-success-subtle text-success">{targetItem.Status || "Available"}</span>
+                <span className={`badge ${assetQty > 0 ? "qr-status-ok" : "qr-status-out"}`}>{assetStatus}</span>
               </div>
             </div>
           </div>
@@ -139,13 +146,13 @@ export const QRCodeModal = ({ equipment, item, isOpen, onClose }) => {
         </div>
 
         <div className="lms-modal-footer d-flex justify-content-end gap-2 p-3 border-top">
-          <button className="btn btn-outline-secondary btn-sm" onClick={onClose}>
+          <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClose}>
             Close
           </button>
-          <button className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" onClick={handleDownload}>
+          <button type="button" className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" onClick={handleDownload}>
             <i className="bi bi-download"></i> Download SVG
           </button>
-          <button className="btn btn-primary btn-sm d-flex align-items-center gap-1" onClick={handlePrint}>
+          <button type="button" className="btn btn-primary btn-sm d-flex align-items-center gap-1" onClick={handlePrint}>
             <i className="bi bi-printer"></i> Print Tag
           </button>
         </div>

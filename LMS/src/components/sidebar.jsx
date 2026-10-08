@@ -1,11 +1,22 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { gsap } from "gsap";
+import { Context } from "./context";
+
+const NAV_ITEMS = [
+  { path: "/dashboard", label: "Dashboard & Stats", icon: "bi-grid-1x2", badge: null, roles: ["Admin", "User"] },
+  { path: "/labdash", label: "Lab Dashboards", icon: "bi-collection", badge: null, roles: ["Admin", "User", "Guest"] },
+  { path: "/equipment", label: "Add Equipment", icon: "bi-plus-circle", badge: "Admin", roles: ["Admin"] },
+  { path: "/lab", label: "Setup New Lab", icon: "bi-building-gear", badge: "Admin", roles: ["Admin"] },
+  { path: "/allocate", label: "Issue & Allocate", icon: "bi-box-arrow-up-right", badge: "Stock", roles: ["Admin"] },
+  { path: "/return", label: "Record Return", icon: "bi-arrow-return-left", badge: "Log", roles: ["Admin", "User"] },
+];
 
 export const Sidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const sidebarRef = useRef(null);
+  const { usertype } = useContext(Context);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -23,13 +34,7 @@ export const Sidebar = () => {
     return () => ctx.revert();
   }, []);
 
-  const navItems = [
-    { path: "/dashboard", label: "Dashboard & Stats", icon: "bi-grid-1x2", badge: null },
-    { path: "/equipment", label: "Add Equipment", icon: "bi-plus-circle", badge: "Admin" },
-    { path: "/lab", label: "Setup New Lab", icon: "bi-building-gear", badge: "Admin" },
-    { path: "/allocate", label: "Issue & Allocate", icon: "bi-box-arrow-up-right", badge: "Stock" },
-    { path: "/return", label: "Record Return", icon: "bi-arrow-return-left", badge: "Log" },
-  ];
+  const navItems = NAV_ITEMS.filter((item) => item.roles.includes(usertype));
 
   return (
     <aside className="lms-sidebar" ref={sidebarRef}>
@@ -44,31 +49,34 @@ export const Sidebar = () => {
           </span>
         </div>
 
-        <ul className="sidebar-menu-list list-unstyled d-flex flex-column gap-1.5 mb-4">
-          {navItems.map((item) => {
-            const isActive = currentPath === item.path;
-            return (
-              <li className="sidebar-menu-item" key={item.path}>
-                <Link 
-                  className={`sidebar-link ${isActive ? "active" : ""}`} 
-                  to={item.path}
-                >
-                  <div className="d-flex align-items-center gap-2.5">
-                    <span className="sidebar-icon-wrap">
-                      <i className={`bi ${item.icon}`}></i>
-                    </span>
-                    <span className="sidebar-link-text">{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className={`sidebar-item-badge ${isActive ? "active" : ""}`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <nav aria-label="Workspace">
+          <ul className="sidebar-menu-list list-unstyled">
+            {navItems.map((item) => {
+              const isActive = currentPath === item.path;
+              return (
+                <li className="sidebar-menu-item" key={item.path}>
+                  <Link
+                    className={`sidebar-link ${isActive ? "active" : ""}`}
+                    to={item.path}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <div className="d-flex align-items-center gap-2.5">
+                      <span className="sidebar-icon-wrap">
+                        <i className={`bi ${item.icon}`}></i>
+                      </span>
+                      <span className="sidebar-link-text">{item.label}</span>
+                    </div>
+                    {item.badge && (
+                      <span className={`sidebar-item-badge ${item.badge === "Admin" ? "sidebar-item-badge-admin" : ""} ${isActive ? "active" : ""}`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
         {/* SYSTEM HEALTH STATUS BADGE */}
         <div className="sidebar-footer pt-2">

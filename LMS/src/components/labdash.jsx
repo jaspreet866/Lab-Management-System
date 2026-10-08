@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Sidebar } from "./sidebar";
 import { gsap } from "gsap";
 import { API_BASE_URL } from "../config";
+import { Context } from "./context";
 
 export const LabDash = () => {
   const [data, setData] = useState([]);
@@ -10,6 +11,9 @@ export const LabDash = () => {
   const [searchParams] = useSearchParams();
   const labid = searchParams.get("id");
   const labdashRef = useRef(null);
+  const { usertype } = useContext(Context);
+  const isAdmin = usertype === "Admin";
+  const isLoggedIn = isAdmin || usertype === "User";
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -59,7 +63,7 @@ export const LabDash = () => {
     <main className="dashboard-page" ref={labdashRef}>
       <div className="container-fluid dashboard-shell px-3 px-md-4 py-3">
         <div className="row g-4 align-items-start">
-          <div className="col-12 col-lg-auto position-sticky" style={{ top: "90px", zIndex: 10 }}>
+          <div className="col-12 col-lg-auto app-sidebar-col">
             <Sidebar />
           </div>
 
@@ -70,7 +74,7 @@ export const LabDash = () => {
                 <div>
                   <div className="d-flex align-items-center gap-2 mb-1">
                     <span className="badge bg-teal-subtle text-teal px-2.5 py-1">
-                      <i className="bi bi-diagram-3 me-1"></i> FACILITY TELEMETRY
+                      <i className="bi bi-diagram-3 me-1"></i> Facility telemetry
                     </span>
                     <span className="text-muted small">
                       {labid ? "Single Facility View" : "All Registered Laboratories"}
@@ -85,18 +89,20 @@ export const LabDash = () => {
                 </div>
 
                 <div className="d-flex flex-wrap align-items-center gap-2">
-                  <div className="p-2.5 px-3 rounded-3 bg-light text-center">
-                    <span className="d-block text-muted" style={{ fontSize: "0.72rem" }}>Active Rooms</span>
-                    <strong className="h5 fw-bold text-themed-main mb-0">{data.length}</strong>
+                  <div className="hero-metric">
+                    <span className="hero-metric-label">Active Rooms</span>
+                    <strong className="hero-metric-value">{data.length}</strong>
                   </div>
-                  <div className="p-2.5 px-3 rounded-3 bg-light text-center">
-                    <span className="d-block text-muted" style={{ fontSize: "0.72rem" }}>Total Capacity</span>
-                    <strong className="h5 fw-bold text-primary mb-0">{totalCapacity}</strong>
+                  <div className="hero-metric">
+                    <span className="hero-metric-label">Total Capacity</span>
+                    <strong className="hero-metric-value text-primary">{totalCapacity.toLocaleString()}</strong>
                   </div>
-                  <Link to="/lab" className="btn btn-sm btn-primary d-flex align-items-center gap-1.5 px-3 py-2">
-                    <i className="bi bi-plus-lg"></i>
-                    <span>Add Facility</span>
-                  </Link>
+                  {isAdmin && (
+                    <Link to="/lab" className="btn btn-sm btn-primary d-flex align-items-center gap-1.5 px-3 py-2">
+                      <i className="bi bi-plus-lg"></i>
+                      <span>Add Facility</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
@@ -110,13 +116,17 @@ export const LabDash = () => {
                 <span className="small">Retrieving laboratory records...</span>
               </div>
             ) : data.length === 0 ? (
-              <div className="p-5 text-center rounded-4 bg-card border shadow-sm my-4">
+              <div className="dash-section-card table-empty-state p-5 text-center my-4">
                 <i className="bi bi-building-x text-muted fs-1 mb-2 d-block"></i>
-                <h5 className="fw-bold mb-1">No laboratory records found</h5>
-                <p className="text-muted small mb-3">Get started by creating your first lab facility.</p>
-                <Link to="/lab" className="btn btn-sm btn-primary">
-                  <i className="bi bi-plus-lg me-1"></i> Setup New Lab
-                </Link>
+                <h2 className="h5 fw-bold mb-1">No laboratory records found</h2>
+                <p className="text-muted small mb-3">
+                  {isAdmin ? "Get started by creating your first lab facility." : "No laboratories have been registered yet."}
+                </p>
+                {isAdmin && (
+                  <Link to="/lab" className="btn btn-sm btn-primary">
+                    <i className="bi bi-plus-lg me-1"></i> Setup New Lab
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="row g-4">
@@ -128,18 +138,18 @@ export const LabDash = () => {
                         <div>
                           {/* Header */}
                           <div className="d-flex align-items-center justify-content-between mb-3">
-                            <div className="d-flex align-items-center gap-2.5">
+                            <div className="d-flex align-items-center gap-2.5 min-w-0">
                               <div className="lab-card-icon bg-teal-subtle text-teal">
                                 <i className="bi bi-building"></i>
                               </div>
-                              <div>
-                                <h5 className="fw-bold mb-0 text-themed-main">{item.LabName}</h5>
-                                <span className="text-muted" style={{ fontSize: "0.72rem" }}>
+                              <div className="min-w-0">
+                                <h2 className="h5 fw-bold mb-0 text-themed-main text-truncate" title={item.LabName}>{item.LabName}</h2>
+                                <span className="text-muted text-caption">
                                   ID: {(item._id || "").slice(-6).toUpperCase() || "LAB-01"}
                                 </span>
                               </div>
                             </div>
-                            <span className="badge bg-success-subtle text-success px-2.5 py-1">
+                            <span className="badge bg-success-subtle text-success px-2.5 py-1 flex-shrink-0">
                               Operational
                             </span>
                           </div>
@@ -164,7 +174,7 @@ export const LabDash = () => {
 
                           {/* Capacity meter */}
                           <div className="mb-3">
-                            <div className="d-flex justify-content-between text-muted" style={{ fontSize: "0.72rem" }}>
+                            <div className="d-flex justify-content-between text-muted text-caption">
                               <span>Capacity Utilization</span>
                               <span>{cap > 50 ? "High Capacity" : cap > 25 ? "Standard" : "Compact"}</span>
                             </div>
@@ -179,22 +189,26 @@ export const LabDash = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="d-flex align-items-center justify-content-between pt-2">
-                          <Link
-                            to="/allocate"
-                            className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5"
-                          >
-                            <i className="bi bi-box-arrow-up"></i>
-                            <span>Issue Stock</span>
-                          </Link>
-                          <Link
-                            to="/return"
-                            className="btn btn-sm btn-primary d-flex align-items-center gap-1.5"
-                          >
-                            <i className="bi bi-arrow-return-left"></i>
-                            <span>Return Device</span>
-                          </Link>
-                        </div>
+                        {isLoggedIn && (
+                          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2">
+                            {isAdmin && (
+                              <Link
+                                to="/allocate"
+                                className="btn btn-sm btn-primary d-flex align-items-center gap-1.5"
+                              >
+                                <i className="bi bi-box-arrow-up"></i>
+                                <span>Issue Stock</span>
+                              </Link>
+                            )}
+                            <Link
+                              to="/return"
+                              className={`btn btn-sm ${isAdmin ? "btn-outline-primary" : "btn-primary"} d-flex align-items-center gap-1.5 ms-auto`}
+                            >
+                              <i className="bi bi-arrow-return-left"></i>
+                              <span>Return Device</span>
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

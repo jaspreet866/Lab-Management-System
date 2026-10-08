@@ -1,20 +1,11 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { ToastContext } from "./useToast";
 
-const ToastContext = createContext(null);
-
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    // Fallback if used outside provider
-    return {
-      showToast: (msg) => console.log(msg),
-      success: (msg) => console.log(msg),
-      error: (msg) => console.error(msg),
-      warning: (msg) => console.warn(msg),
-      info: (msg) => console.info(msg),
-    };
-  }
-  return context;
+const TOAST_ICONS = {
+  success: "bi-check-circle-fill",
+  error: "bi-exclamation-octagon-fill",
+  warning: "bi-exclamation-triangle-fill",
+  info: "bi-info-circle-fill",
 };
 
 export const ToastProvider = ({ children }) => {
@@ -25,7 +16,7 @@ export const ToastProvider = ({ children }) => {
   }, []);
 
   const showToast = useCallback((message, type = "info", duration = 3500) => {
-    const id = Date.now() + Math.random().toString(36).substr(2, 9);
+    const id = Date.now() + Math.random().toString(36).slice(2, 11);
     const newToast = { id, message, type, duration };
 
     setToasts((prev) => [...prev, newToast]);
@@ -42,20 +33,6 @@ export const ToastProvider = ({ children }) => {
   const warning = useCallback((msg, duration) => showToast(msg, "warning", duration), [showToast]);
   const info = useCallback((msg, duration) => showToast(msg, "info", duration), [showToast]);
 
-  const getIcon = (type) => {
-    switch (type) {
-      case "success":
-        return "bi-check-circle-fill";
-      case "error":
-        return "bi-exclamation-octagon-fill";
-      case "warning":
-        return "bi-exclamation-triangle-fill";
-      case "info":
-      default:
-        return "bi-info-circle-fill";
-    }
-  };
-
   return (
     <ToastContext.Provider value={{ showToast, success, error, warning, info }}>
       {children}
@@ -64,11 +41,11 @@ export const ToastProvider = ({ children }) => {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`lms-toast lms-toast-${toast.type} shadow-lg`}
-            role="alert"
+            className={`lms-toast lms-toast-${toast.type}`}
+            role={toast.type === "error" ? "alert" : "status"}
           >
             <div className="lms-toast-icon">
-              <i className={`bi ${getIcon(toast.type)}`}></i>
+              <i className={`bi ${TOAST_ICONS[toast.type] || TOAST_ICONS.info}`}></i>
             </div>
             <div className="lms-toast-body">
               <span>{toast.message}</span>
@@ -77,7 +54,7 @@ export const ToastProvider = ({ children }) => {
               type="button"
               className="lms-toast-close"
               onClick={() => removeToast(toast.id)}
-              aria-label="Close"
+              aria-label="Dismiss notification"
             >
               <i className="bi bi-x"></i>
             </button>

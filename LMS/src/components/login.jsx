@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Context } from "./context";
 import { gsap } from "gsap";
 import { API_BASE_URL } from "../config";
-import { useToast } from "./ToastContext";
+import { useToast } from "./useToast";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -78,8 +78,8 @@ export const Login = () => {
   };
 
   const fillDemoAdmin = () => {
-    setEmail("admin@lms.com");
-    setPass("admin123");
+    setEmail("admin@gmail.com");
+    setPass("Admin@123");
     info("Filled Admin demo credentials");
   };
 
@@ -129,7 +129,7 @@ export const Login = () => {
                       <i className="bi bi-lock"></i>
                     </span>
                     <input
-                      className="form-control border-end-0"
+                      className="form-control"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={pass}
@@ -138,9 +138,10 @@ export const Login = () => {
                     />
                     <button
                       type="button"
-                      className="input-group-text bg-transparent border-start-0 cursor-pointer"
+                      className="input-group-text input-group-action"
                       onClick={() => setShowPassword(!showPassword)}
                       title={showPassword ? "Hide password" : "Show password"}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} text-muted`}></i>
                     </button>

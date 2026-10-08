@@ -23,8 +23,11 @@ app.use(cors({
 
 app.use(express.json())
 
-app.listen(9000, () => {
-    console.log("Server is Running on port 9000")
+// Hosting platforms such as Render assign the port through the environment
+const PORT = process.env.PORT || 9000
+
+app.listen(PORT, () => {
+    console.log(`Server is Running on port ${PORT}`)
 })
 
 mongoose.connect(process.env.Mongo_url)
@@ -241,7 +244,7 @@ app.post("/api/addequipment", async (req, res) => {
         const newEquipment = new equipment({
             EquipmentName: req.body.name,
             Quantity: qty,
-            Status: qty > 0 ? "Avaliable" : "Out of Stock",
+            Status: qty > 0 ? "Available" : "Out of Stock",
             Date: new Date().toISOString()
         })
         const response = await newEquipment.save()
@@ -277,7 +280,7 @@ app.put("/api/updateequip/:id", async (req, res) => {
         const result = await equipment.updateOne({ _id: req.params.id }, {
             $set: {
                 Quantity: newQty,
-                Status: newQty > 0 ? "Avaliable" : "Out of Stock"
+                Status: newQty > 0 ? "Available" : "Out of Stock"
             }
         })
         if (result.modifiedCount > 0) {

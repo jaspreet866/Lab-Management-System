@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Sidebar } from "./sidebar";
-import { useNavigate, Link } from "react-router-dom";
-import { Context } from "./context";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { API_BASE_URL } from "../config";
-import { useToast } from "./ToastContext";
+import { useToast } from "./useToast";
+import { useRequireRole } from "./useRequireRole";
 
 export const AddEquipment = () => {
   const [name, setName] = useState("");
@@ -12,9 +12,7 @@ export const AddEquipment = () => {
   const [category, setCategory] = useState("Electronics");
   const [location, setLocation] = useState("Central Store");
   const [loading, setLoading] = useState(false);
-  const { usertype } = useContext(Context);
   const { success, error, warning } = useToast();
-  const navigate = useNavigate();
   const formRef = useRef(null);
 
   useEffect(() => {
@@ -35,11 +33,7 @@ export const AddEquipment = () => {
     return () => ctx.revert();
   }, []);
 
-  useEffect(() => {
-    if (usertype !== "Admin" && localStorage.getItem("Utype") !== "Admin") {
-      navigate("/");
-    }
-  }, [usertype, navigate]);
+  useRequireRole(["Admin"]);
 
   const add = async (e) => {
     e.preventDefault();
@@ -86,7 +80,7 @@ export const AddEquipment = () => {
       <section className="management-page" ref={formRef}>
         <div className="container-fluid dashboard-shell px-3 px-md-4 py-3">
           <div className="row g-4 align-items-start">
-            <div className="col-12 col-lg-auto position-sticky" style={{ top: "90px", zIndex: 10 }}>
+            <div className="col-12 col-lg-auto app-sidebar-col">
               <Sidebar />
             </div>
 
@@ -96,7 +90,7 @@ export const AddEquipment = () => {
                 <div>
                   <div className="d-flex align-items-center gap-2 mb-1 form-hero-badge">
                     <span className="badge bg-primary-subtle text-primary px-2.5 py-1">
-                      <i className="bi bi-box-seam me-1"></i> INVENTORY CATALOG
+                      <i className="bi bi-box-seam me-1"></i> Inventory catalog
                     </span>
                     <span className="text-muted small">New Asset Registration</span>
                   </div>

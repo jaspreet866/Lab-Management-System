@@ -6,24 +6,20 @@ import { Routee } from './components/routes'
 import { ToastProvider } from './components/ToastContext'
 import { CommandPalette } from './components/CommandPalette'
 
+const readStoredRole = () => {
+  const ut = localStorage.getItem("Utype")
+  return ut === "Admin" || ut === "User" ? ut : "Guest"
+}
+
 function App() {
-  const [usertype, setusertype] = useState(" ")
-  const [theme, setTheme] = useState(localStorage.getItem("lms_theme") || "light")
+  const [usertype, setusertype] = useState(readStoredRole)
+  const [theme, setTheme] = useState(localStorage.getItem("lms_theme") === "dark" ? "dark" : "light")
   const [isCmdOpen, setIsCmdOpen] = useState(false)
 
   useEffect(() => {
-    const ut = localStorage.getItem("Utype");
-    if (ut === "Admin") {
-      setusertype("Admin")
-    } else if (ut === "User") {
-      setusertype("User")
-    } else {
-      setusertype("Guest")
-    }
-  }, []);
-
-  useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme)
+    // Keeps Bootstrap's own components (badges, alerts, progress bars) in the same theme
+    document.documentElement.setAttribute("data-bs-theme", theme)
     localStorage.setItem("lms_theme", theme)
   }, [theme])
 
